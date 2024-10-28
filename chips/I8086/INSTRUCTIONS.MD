@@ -29,12 +29,12 @@
 - [ ] SBB_AX_Iv
 - [ ] PUSH_DS
 - [ ] POP_DS
-- [ ] AND_Eb_Gb
-- [ ] AND_Ev_Gv
-- [ ] AND_Gb_Eb
-- [ ] AND_Gv_Ev
-- [ ] AND_AL_Ib
-- [ ] AND_AX_Iv
+- [x] AND_Eb_Gb
+- [x] AND_Ev_Gv
+- [x] AND_Gb_Eb
+- [x] AND_Gv_Ev
+- [x] AND_AL_Ib
+- [x] AND_AX_Iv
 - [ ] ES
 - [ ] DAA
 - [ ] SUB_Eb_Gb
@@ -45,12 +45,12 @@
 - [ ] SUB_AX_Iv
 - [ ] CS
 - [ ] DAS
-- [ ] XOR_Eb_Gb
-- [ ] XOR_Ev_Gv
-- [ ] XOR_Gb_Eb
-- [ ] XOR_Gv_Ev
-- [ ] XOR_AL_Ib
-- [ ] XOR_AX_Iv
+- [x] XOR_Eb_Gb
+- [x] XOR_Ev_Gv
+- [x] XOR_Gb_Eb
+- [x] XOR_Gv_Ev
+- [x] XOR_AL_Ib
+- [x] XOR_AX_Iv
 - [ ] SS
 - [ ] AAA
 - [ ] CMP_Eb_Gb

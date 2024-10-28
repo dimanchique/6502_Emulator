@@ -20,11 +20,8 @@ public:
         std::printf("Cycles passed %d expected %d\n", cyclesPassed, cyclesExpected);
     }
 
-    void CheckCyclesCount(S32 customCyclesExpected = -1) const noexcept {
-        if (customCyclesExpected == -1)
-            EXPECT_EQ(cyclesPassed, cyclesExpected);
-        else
-            EXPECT_EQ(cyclesPassed, customCyclesExpected);
+    void CheckCyclesCount() const noexcept {
+        EXPECT_EQ(cyclesPassed, cyclesExpected);
     }
 
     void CheckStatus(const I8080_Status &targetStatus){

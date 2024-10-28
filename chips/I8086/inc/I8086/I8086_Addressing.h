@@ -1,11 +1,18 @@
 #pragma once
 
 #include "core/types.h"
+#include "core/compilers_macro.h"
+
+class I8086;
+struct Memory;
+
+template<typename T>
+using OperandSetter = void (*)(I8086 &, Memory &, const void *, T);
+
+template<typename T>
+using OperandGetter = T(*)(I8086 &, Memory &, const void *);
 
 struct ModRegByte {
-
-    explicit ModRegByte(BYTE value = 0) : value(value) {}
-
     union {
         struct {
             BYTE rm: 3;
@@ -14,122 +21,53 @@ struct ModRegByte {
         };
         BYTE value = 0;
     };
+
+    FORCE_INLINE static ModRegByte FromByte(BYTE value) {
+        ModRegByte modReg;
+        modReg.value = value;
+        return modReg;
+    }
 };
 
-// Direction
 enum class InstructionDirection {
-    Mem_Reg, Reg_MemReg, MemReg_Imm
+    MemReg_Reg, Reg_MemReg, MemReg_Imm
 };
 
 enum class OperandType {
     Reg, Mem
 };
 
+template<typename T>
 struct OperandInfo {
     OperandType type;
-
     union {
         void *reg = nullptr;
         DWORD mem;
-    };
+    } operand;
+
+    OperandGetter<T> get;
+    OperandSetter<T> set;
 };
 
+template<typename T>
 struct InstructionData {
-    union{
-        struct{
-            OperandInfo leftOp;
-            OperandInfo rightOp;
-        } doubleOps;
-        OperandInfo singleOp; // case for GRP instructions
-    };
-};
-
-enum ByteRegisters : BYTE {
-    bAL, bCL, bDL, bBL, bAH, bCH, bDH, bBH
-};
-
-enum WordRegisters : BYTE {
-    wAX, wCX, wDX, wBX, wSP, wBP, wSI, wDI
-};
-
-enum sWordRegisters : BYTE {
-    swES, swCS, swSS, swDS
-};
-
-enum AddressMode : BYTE {
-    modeBXpSI, modeBXpDI, modeBPpSI, modeBPpDI, modeSI, modeDI, modeBP, modeBX, modeDirect
-};
-
-enum class OperandArchetype {
-    Reg, Mem
-};
-
-struct OperandConstructor {
-    OperandArchetype archetype{};
-
     union {
         struct {
-            union{
-                ByteRegisters byteReg;
-                WordRegisters wordReg;
-                sWordRegisters swordReg;
-            };
-        } regData{};
-
-        struct {
-            BYTE dispSize = 0;
-            WORD dispValue = 0;
-            AddressMode mode;
-        } memData;
+            OperandInfo<T> leftOp;
+            OperandInfo<T> rightOp;
+        };                          // Regular instruction operands
+        OperandInfo<T> singleOp;    // GRP instructions operand
     };
 };
 
-// For testing purposes only
-// Construct MOD|REG|R/M byte
-struct ModRegByteConstructor {
-    OperandSize size = OperandSize::BYTE;
+template<typename T>
+struct OperandValue{
+    T before;
+    T after;
+};
 
-    OperandConstructor leftOp;
-    OperandConstructor rightOp;
-
-    BYTE MakeModByte() {
-        ModRegByte modByte{};
-
-        // MOD field filling
-        // MOD = 0b11 only if both operands are registers
-        // MOD field contains displacement size otherwise
-        if (leftOp.archetype == OperandArchetype::Reg && rightOp.archetype == OperandArchetype::Reg)
-            modByte.mod = 0b11;
-        else{
-            modByte.mod = leftOp.archetype == OperandArchetype::Mem ?
-                          leftOp.memData.dispSize :
-                          rightOp.memData.dispSize;
-        }
-
-        // REG field filling
-        // cast regData to byte is legal, enum values are sorted
-        modByte.reg = size == OperandSize::BYTE ?
-                      (BYTE)rightOp.regData.byteReg :
-                      (BYTE)rightOp.regData.wordReg;
-
-        // R/M field filling
-        // if leftOp is reg just cast to byte as above section
-        if (leftOp.archetype == OperandArchetype::Reg)
-        {
-            modByte.rm = size == OperandSize::BYTE ?
-                         (BYTE)leftOp.regData.byteReg :
-                         (BYTE)leftOp.regData.wordReg;
-        }
-        // if leftOp is mem we need a "hack"
-        else
-        {
-            // Direct mode and BP indexed mode both have the same value (0b110) but cast doesn't work in this case
-            if (leftOp.memData.mode == modeDirect)
-                modByte.rm = (BYTE)modeBP;
-            else
-                modByte.rm = (BYTE)leftOp.memData.mode;
-        }
-
-        return modByte.value;
-    }
+template<typename T>
+struct InstructionResult{
+    OperandValue<T> leftOp;
+    OperandValue<T> rightOp;
 };

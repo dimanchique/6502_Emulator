@@ -117,7 +117,7 @@ enum I8086_OpCodes : BYTE {
     JG_Jb = 0x7F,
     GRP1_Eb_Ib = 0x80,
     GRP1_Ev_Iv = 0x81,
-    // GRP1_Eb_Ib = 0x82, //duplicated 0x80 but...is it necessary?
+    // GRP1_Eb_Ib = 0x82, //duplicated 0x80 but is it necessary?
     GRP1_Ev_Ib = 0x83,
     TEST_Gb_Eb = 0x84,
     TEST_Gv_Ev = 0x85,
@@ -231,10 +231,9 @@ enum I8086_OpCodes : BYTE {
     GRP5_Ev = 0xFF
 };
 
-enum I8086_OpCods_GRP1 : BYTE
-{
+enum I8086_OpCods_GRP1 : BYTE {
     GRP1_ADD = 0x00,
-    GRP1_OR  = 0x01,
+    GRP1_OR = 0x01,
     GRP1_ADC = 0x02,
     GRP1_SBB = 0x03,
     GRP1_AND = 0x04,
@@ -243,8 +242,7 @@ enum I8086_OpCods_GRP1 : BYTE
     GRP1_CMP = 0x07
 };
 
-enum I8086_OpCods_GRP2 : BYTE
-{
+enum I8086_OpCods_GRP2 : BYTE {
     GRP2_ROL = 0x00,
     GRP2_ROR = 0x01,
     GRP2_RCL = 0x02,
@@ -254,8 +252,7 @@ enum I8086_OpCods_GRP2 : BYTE
     GRP2_SAR = 0x07
 };
 
-enum I8086_OpCods_GRP3a : BYTE
-{
+enum I8086_OpCods_GRP3a : BYTE {
     GRP3a_TEST_Eb_Ib = 0x00,
     GRP3a_NOT        = 0x02,
     GRP3a_NEG        = 0x03,
@@ -265,8 +262,7 @@ enum I8086_OpCods_GRP3a : BYTE
     GRP3a_IDIV       = 0x07
 };
 
-enum I8086_OpCods_GRP3b : BYTE
-{
+enum I8086_OpCods_GRP3b : BYTE {
     GRP3b_TEST_Ev_Iv = 0x00,
     GRP3b_NOT        = 0x02,
     GRP3b_NEG        = 0x03,
@@ -276,14 +272,12 @@ enum I8086_OpCods_GRP3b : BYTE
     GRP3b_IDIV       = 0x07
 };
 
-enum I8086_OpCods_GRP4 : BYTE
-{
+enum I8086_OpCods_GRP4 : BYTE {
     GRP4_INC = 0x00,
     GRP4_DEC = 0x01
 };
 
-enum I8086_OpCods_GRP5 : BYTE
-{
+enum I8086_OpCods_GRP5 : BYTE {
     GRP5_INC     = 0x00,
     GRP5_DEC     = 0x01,
     GRP5_CALL    = 0x02,
