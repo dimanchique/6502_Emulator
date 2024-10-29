@@ -37,8 +37,8 @@ struct OperandConstructor {
         } regData{};
 
         struct {
-            BYTE dispSize = 0;
-            WORD dispValue = 0;
+            BYTE dispSize;
+            WORD dispValue;
             AddressMode mode;
         } memData;
     };
