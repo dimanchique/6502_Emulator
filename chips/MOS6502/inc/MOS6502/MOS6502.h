@@ -4,27 +4,34 @@
 #include "MOS6502_Status.h"
 #include "base/compute.h"
 
-#define STOP_OPCODE 0x02 // one of unused OpCodes so it's pretty much OK to use it a stop flag
-#define PAGE_SIZE 0xFF
-#define IsPageCrossed(src, dst) ((src ^ dst) >= PAGE_SIZE)
+#define STOP_OPCODE 0x02 /**< One of unused MOS6502 opcodes used to stop execution of finite programs*/
+#define PAGE_SIZE 0xFF /**< MOS6502 default page size */
+#define IsPageCrossed(src, dst) ((src ^ dst) >= PAGE_SIZE) /**< Memory page is crossed when it bounds PAGE_SIZE */
 
-class MOS6502 final: public Compute{
+/**
+ * @class MOS6502
+ * @brief MOS6502 CPU implementation
+ * @details MOS6502 (Launch: 1975) is an 8-bit microprocessor with 55 supported instructions and 8 addressing modes.
+ * Registers: Program Counter register (PC), Stack Pointer register (SP), Accumulator register (A), two index registers (X,Y) and Status.
+ * Max CPU clock rate 1-3 MHz. Data width: 8 bits. Address width: 16 bits
+ */
+class MOS6502 final : public Compute {
 public:
 
-    WORD PC;                // Program Counter
-    BYTE SP;                // Stack Pointer (+ 0x100 offset)
-    BYTE A;                 // Accumulator
-    BYTE X;                 // X Register
-    BYTE Y;                 // Y Register
-    MOS6502_Status Status;  // Status Register
+    WORD PC;                /**< Program Counter */
+    BYTE SP;                /**< Stack Pointer (+ 0x100 offset) */
+    BYTE A;                 /**< Accumulator */
+    BYTE X;                 /**< X Register */
+    BYTE Y;                 /**< Y Register */
+    MOS6502_Status Status;  /**< Status Register */
 
     void Reset(Memory &memory) noexcept override;
 
     U32 Run(Memory &memory) override;
 
     /**
-     * @brief Fetch byte from memory.
-     * @attention Increments PC and cycles count.
+     * @brief Fetch byte from memory address PC points to.
+     * @note Increments PC and cycles count.
      * @param memory Memory struct instance.
      * @return Fetched byte.
      */
@@ -35,8 +42,11 @@ public:
     }
 
     /**
-     * @brief Fetch word from memory.
-     * @attention Increments PC by 2. Increments cycles count by 2.
+     * @brief Fetch word from memory address PC points to.
+     * @note Increments PC by 2. Increments cycles count by 2.
+     * @attention MOS6502 is little-endian system.
+     * 16-bit word value has memory layout [LOW][HIGH].
+     * Additional 8-bit shift is needed.
      * @param memory Memory struct instance.
      * @return Fetched word.
      */
@@ -48,7 +58,7 @@ public:
 
     /**
      * @brief Read byte from memory.
-     * @attention Increments cycles count.
+     * @note Increments cycles count.
      * @param memory Memory struct instance.
      * @param address Address to read from.
      * @return Read byte.
@@ -61,7 +71,10 @@ public:
 
     /**
      * @brief Read word from memory.
-     * @attention Increments PC by 2. Increments cycles count by 2.
+     * @note Increments PC by 2. Increments cycles count by 2.
+     * @attention MOS6502 is little-endian system.
+     * 16-bit word value has memory layout [LOW][HIGH].
+     * Additional 8-bit shift is needed.
      * @param memory Memory struct instance.
      * @param address Address to read from.
      * @return Fetched word.
@@ -73,12 +86,11 @@ public:
     }
 
     /**
-     * @brief Writes a byte from memory.
-     * @attention Increments cycles count.
+     * @brief Write a byte to memory.
+     * @note Increments cycles count.
      * @param memory Memory struct instance.
      * @param value Value to write.
-     * @param address Address to read from.
-     * @return Read byte.
+     * @param address Address to write to.
      */
     FORCE_INLINE void WriteByte(Memory &memory, const BYTE value, const WORD address) {
         memory[address] = value;
@@ -86,8 +98,11 @@ public:
     }
 
     /**
-     * @brief Write word to memory.
-     * @attention Increments cycles count by 2.
+     * @brief Write a word to memory.
+     * @note Increments cycles count by 2.
+     * @attention MOS6502 is little-endian system.
+     * 16-bit word value has memory layout [LOW][HIGH].
+     * Additional 8-bit shift is needed.
      * @param memory Memory struct instance.
      * @param value Value to write.
      * @param address Address to write to.
@@ -100,8 +115,8 @@ public:
     }
 
     /**
-     * @brief Pushes the Program Counter (PC) register value to the stack.
-     * @attention Increments cycles count by 2. Decrements the Stack Pointer by 2.
+     * @brief Push Program Counter (PC) register value to stack.
+     * @see PushWordToStack
      * @param memory Memory struct instance.
      */
     FORCE_INLINE void PushProgramCounterToStack(Memory &memory) {
@@ -109,8 +124,9 @@ public:
     }
 
     /**
-     * @brief Pops an address from the stack.
-     * @attention Increments cycles count by 2. Increments the Stack Pointer by 2.
+     * @brief Pop an address from stack.
+     * @note Increments cycles count by 2. Increments the Stack Pointer by 2.
+     * @see PopWordFromStack
      * @param memory Memory struct instance.
      * @return Popped address.
      */
@@ -119,8 +135,9 @@ public:
     }
 
     /**
-     * @brief Pushes the Status register value to the stack.
-     * @attention Increments cycles count by 2. Decrements the Stack Pointer.
+     * @brief Push Status register value to stack.
+     * @note Increments cycles count by 2. Decrements the Stack Pointer.
+     * @see WriteByte
      * @param memory Memory struct instance.
      */
     FORCE_INLINE void PushStatusToStack(Memory &memory) {
@@ -130,8 +147,9 @@ public:
     }
 
     /**
-     * @brief Pops the Status register value from the stack.
-     * @attention Increments cycles count by 3. Increments the Stack Pointer.
+     * @brief Pop Status register value from the stack.
+     * @note Increments cycles count by 3. Increments the Stack Pointer.
+     * @see ReadByte
      * @param memory Memory struct instance.
      */
     FORCE_INLINE void PopStatusFromStack(const Memory &memory) {
@@ -142,10 +160,11 @@ public:
     }
 
     /**
-     * @brief Pushes a byte to the stack.
-     * @attention Increments cycles count by 2. Decrements the Stack Pointer.
+     * @brief Push a byte to stack.
+     * @note Increments cycles count by 2. Decrements the Stack Pointer.
+     * @see WriteByte
      * @param memory Memory struct instance.
-     * @param value Value to push to the stack.
+     * @param value Value to push to stack.
      */
     FORCE_INLINE void PushByteToStack(Memory &memory, const BYTE value) {
         WriteByte(memory, value, StackPointerToAddress());
@@ -154,8 +173,9 @@ public:
     }
 
     /**
-     * @brief Pops a byte from the stack.
-     * @attention Increments cycles count by 3. Increments the Stack Pointer.
+     * @brief Pop a byte from stack.
+     * @note Increments cycles count by 3. Increments the Stack Pointer.
+     * @see ReadByte
      * @param memory Memory struct instance.
      * @return Popped value.
      */
@@ -168,10 +188,11 @@ public:
     }
 
     /**
-     * @brief Pushes a word to the stack.
-     * @attention Increments cycles count by 2. Decrements the Stack Pointer by 2.
+     * @brief Push a word to stack.
+     * @note Increments cycles count by 2. Decrements the Stack Pointer by 2.
+     * @see WriteWord
      * @param memory Memory struct instance.
-     * @param value Value to push to the stack.
+     * @param value Value to push to stack.
      */
     FORCE_INLINE void PushWordToStack(Memory &memory, const WORD value) {
         WriteWord(memory, value, StackPointerToAddress() - 1);
@@ -179,8 +200,9 @@ public:
     }
 
     /**
-     * @brief Pops a word from the stack.
-     * @attention Increments cycles count by 4. Increments the Stack Pointer by 2.
+     * @brief Pop a word from stack.
+     * @note Increments cycles count by 4. Increments the Stack Pointer by 2.
+     * @see ReadWord
      * @param memory Memory struct instance.
      * @return Popped value.
      */
@@ -192,180 +214,177 @@ public:
         return value;
     }
 
+/** @defgroup MOS6502-Addressing MOS6502 Addressing
+ *  MOS6502 Addressing Modes
+ *  @{
+ */
+
     /**
-     * @brief Get value using ZeroPage addressing mode.
-     * @note Call FetchByte.
-     * @note Call ReadByte using the fetched byte as the ZeroPage address.
-     * @attention Increments cycles count by 2. Increments PC.
+     * @brief Get Zero Page addressing mode value.
+     * @details FetchByte. Use fetched byte as an effective address to read from.
+     * Read byte using given effective address.
+     * @note Increments cycles count by 2. Increments PC.
+     * @addressing Zero Page
+     * @see FetchByte
+     * @see ReadByte
      * @param memory Memory struct instance.
      * @return Zero Page address value.
      */
     FORCE_INLINE BYTE GetZeroPageValue(const Memory &memory) {
-        const BYTE TargetAddress = FetchByte(memory);
-        return ReadByte(memory, TargetAddress);
+        const BYTE effectiveAddress = FetchByte(memory);
+        return ReadByte(memory, effectiveAddress);
     }
 
     /**
-     * @brief Get generic ZeroPage address.
-     * @note Call FetchByte.
-     * @note Add offset to the fetched byte to get a generic ZeroPage address.
-     * @attention Increments cycles count. Increments PC.
-     * @addressing Zero Page,X
-     * @addressing Zero Page,Y
-     * @param memory Memory struct instance.
-     * @param offsetAddress Offset memory address value.
-     * @return Generic ZeroPage address.
-     */
-    FORCE_INLINE WORD GetZeroPageAddress(const Memory& memory, const BYTE offsetAddress) {
-        const BYTE TargetAddress = FetchByte(memory);
-        cycles++;
-        return TargetAddress + offsetAddress;
-    }
-
-    /**
-     * @brief Get generic ZeroPage value.
-     * @note Call FetchByte.
-     * @note Add offset to the fetched byte to get a generic ZeroPage address.
-     * @note Call ReadByte using generic ZeroPage address.
-     * @attention Increments cycles count. Increments PC.
-     * @addressing Zero Page,X
-     * @addressing Zero Page,Y
-     * @param memory Memory struct instance.
-     * @param offsetAddress Offset memory address value.
-     * @return Generic ZeroPage value.
-     */
-    FORCE_INLINE BYTE GetZeroPageValue(const Memory& memory, const BYTE offsetAddress) {
-        const BYTE TargetAddress = GetZeroPageAddress(memory, offsetAddress);
-        return ReadByte(memory, TargetAddress);
-    }
-
-    /**
-     * @brief Get value using Absolute addressing mode.
-     * @note Call FetchWord.
-     * @note Call ReadByte using the fetched word address.
-     * @attention Increments cycles count by 3. Increments PC by 2.
+     * @brief Get Absolute addressing mode value.
+     * @note Increments cycles count by 3. Increments PC by 2.
+     * @addressing Absolute
+     * @see FetchWord
+     * @see ReadByte
      * @param memory Memory struct instance.
      * @return Absolute address value.
      */
-    FORCE_INLINE BYTE GetAbsValue(const Memory& memory) {
-        const WORD TargetAddress = FetchWord(memory);
-        return ReadByte(memory, TargetAddress);
+    FORCE_INLINE BYTE GetAbsValue(const Memory &memory) {
+        const WORD baseAddress = FetchWord(memory);
+        return ReadByte(memory, baseAddress);
     }
 
     /**
-     * @brief Get generic Absolute address.
-     * @note Call FetchWord.
-     * @note Add offset to the fetched word to get a generic Absolute address.
-     * @attention Increments cycles count by 2. Increments PC by 2.
-     * @attention Extra cycles count increment if a page cross is detected
-     * @attention Extra cycles is not applied for ASL/DEC/INC/LSR/ROR/ROL/STA
-     * @addressing Absolute,X
-     * @addressing Absolute,Y
+     * @brief Get Indexed Zero Page addressing mode value (Generic).
+     * @addressing Zero Page,X
+     * Zero Page,Y
+     * @see GetZeroPageIndexedAddress
      * @param memory Memory struct instance.
-     * @param offsetAddress Offset memory address value.
-     * @return Generic Absolute address.
+     * @param offsetValue Address offset value.
+     * @return Zero Page Indexed value.
      */
-    FORCE_INLINE WORD GetAbsAddress(const Memory& memory, const BYTE offsetAddress, bool shouldCheckPageCross = true) {
-        const WORD AbsAddress = FetchWord(memory);
-        const WORD TargetAddress = AbsAddress + offsetAddress;
+    FORCE_INLINE BYTE GetZeroPageIndexedValue(const Memory &memory, const BYTE offsetValue) {
+        const BYTE effectiveAddress = GetZeroPageIndexedAddress(memory, offsetValue);
+        return ReadByte(memory, effectiveAddress);
+    }
+
+    /**
+     * @brief Get Indexed ZeroPage addressing mode address (Generic).
+     * @details Fetch byte. Add offset to fetched byte to get effective address.
+     * @attention Increments cycles count by 2. Increments PC.
+     * @addressing Zero Page,X
+     * Zero Page,Y
+     * @see FetchByte
+     * @param memory Memory struct instance.
+     * @param offsetValue Address offset value.
+     * @return Zero Page Indexed address.
+     */
+    FORCE_INLINE WORD GetZeroPageIndexedAddress(const Memory &memory, const BYTE offsetValue) {
+        const BYTE baseAddress = FetchByte(memory);
+        cycles++;
+        return baseAddress + offsetValue;
+    }
+
+    /**
+     * @brief Get Indexed Absolute addressing mode value (Generic).
+     * @addressing Absolute,X
+     * Absolute,Y
+     * @see GetAbsIndexedAddress
+     * @param memory Memory struct instance.
+     * @param offsetValue Address offset value.
+     * @return Absolute Indexed address value.
+     */
+    FORCE_INLINE BYTE GetAbsIndexedValue(const Memory &memory, const BYTE offsetValue, bool shouldCheckPageCross = true) {
+        const WORD effectiveAddress = GetAbsIndexedAddress(memory, offsetValue, shouldCheckPageCross);
+        return ReadByte(memory, effectiveAddress);
+    }
+
+    /**
+     * @brief Get Indexed Absolute addressing mode address (Generic).
+     * @note Fetch word. Add offset to fetched word to get effective address.
+     * @attention Increments cycles count by 2. Increments PC by 2.
+     * Extra cycles count increment if a page cross is detected.
+     * Extra cycles is not applied for ASL/DEC/INC/LSR/ROR/ROL/STA.
+     * @addressing Absolute,X
+     * Absolute,Y
+     * @see FetchWord
+     * @param memory Memory struct instance.
+     * @param offsetValue Address offset value.
+     * @return Absolute Indexed address.
+     */
+    FORCE_INLINE WORD GetAbsIndexedAddress(const Memory &memory, const BYTE offsetValue, bool shouldCheckPageCross = true) {
+        const WORD baseAddress = FetchWord(memory);
+        const WORD effectiveAddress = baseAddress + offsetValue;
 
         // add extra cycle if NO page-cross check
-        if (!shouldCheckPageCross || IsPageCrossed(TargetAddress, AbsAddress))
+        if (!shouldCheckPageCross || IsPageCrossed(effectiveAddress, baseAddress))
             cycles++;
-        return TargetAddress;
+        return effectiveAddress;
     }
 
     /**
-     * @brief Get generic Absolute value.
-     * @note Call FetchWord.
-     * @note Add offset to the fetched word to get a generic Absolute address.
-     * @note Call ReadByte using the generic Absolute address.
-     * @attention Increments cycles count by 3. Increments PC by 2.
-     * @attention Extra cycles count increment if a page cross is detected.
-     * @addressing Absolute,X
-     * @addressing Absolute,Y
-     * @param memory Memory struct instance.
-     * @param offsetAddress Offset memory address value.
-     * @return Generic Absolute address value.
-     */
-    FORCE_INLINE BYTE GetAbsValue(const Memory& memory, const BYTE offsetAddress, bool shouldCheckPageCross = true) {
-        const WORD TargetAddress = GetAbsAddress(memory, offsetAddress, shouldCheckPageCross);
-        return ReadByte(memory, TargetAddress);
-    }
-
-    /**
-     * @brief Get (Indirect,X) address.
-     * @note Call FetchByte.
-     * @note Add X to the fetched value.
-     * @note Call ReadWord using this value to get (Indirect,X) address.
-     * @attention Increments cycles count by 4. Increments PC.
+     * @brief Get (Indirect,X) addressing mode value.
      * @addressing (Indirect,X)
-     * @param memory Memory struct instance.
-     * @return (Indirect,X) address.
-     */
-    FORCE_INLINE WORD GetIndXAddress(const Memory& memory) {
-        const BYTE TargetAddress = FetchByte(memory) + X;
-        cycles++;
-        return ReadWord(memory, TargetAddress);
-    }
-
-    /**
-     * @brief Get value using (Indirect,X) address.
-     * @note Call FetchByte.
-     * @note Add X to the fetched value.
-     * @note Call ReadWord using this value to get (Indirect,X) address.
-     * @note Call ReadByte using (Indirect,X) address to get the result value.
-     * @attention Increments cycles count by 5. Increments PC.
-     * @addressing (Indirect,X)
+     * @see GetIndXAddress
      * @param memory Memory struct instance.
      * @return (Indirect,X) address value.
      */
-    FORCE_INLINE BYTE GetIndXAddressValue(const Memory& memory) {
-        const WORD TargetAddress = GetIndXAddress(memory);
-        return ReadByte(memory, TargetAddress);
+    FORCE_INLINE BYTE GetIndXAddressValue(const Memory &memory) {
+        const WORD effectiveAddress = GetIndXAddress(memory);
+        return ReadByte(memory, effectiveAddress);
     }
 
     /**
-     * @brief Get (Indirect),Y address.
-     * @note Call FetchByte.
-     * @note Call ReadWord using the fetched byte to get the Effective Address.
-     * @note Add Y to the Effective Address to get (Indirect),Y address.
-     * @attention Increments cycles count by 3. Increments PC.
-     * @attention Extra cycles count increment if a page cross is detected.
-     * @attention Extra cycles is not applied for EOR/STA instructions
-     * @addressing (Indirect),Y
-     * @param memory Memory struct instance.
-     * @return (Indirect),Y address.
-     */
-    FORCE_INLINE WORD GetIndYAddress(const Memory& memory, bool shouldCheckPageCross = true) {
-        const BYTE ZeroPageAddress = FetchByte(memory);
-        const WORD EffectiveAddress = ReadWord(memory, ZeroPageAddress);
-        const WORD TargetAddress = EffectiveAddress + Y;
-        if (shouldCheckPageCross && IsPageCrossed(TargetAddress, EffectiveAddress))
-            cycles++;
-        return TargetAddress;
-    }
-
-    /**
-     * @brief Get (Indirect),Y address value.
-     * @note Call FetchByte.
-     * @note Call ReadWord using the fetched byte to get the Effective Address.
-     * @note Add Y to the Effective Address to get (Indirect),Y address.
-     * @note ReadByte using (Indirect),Y address to get the result value.
+     * @brief Get (Indirect,X) addressing mode address.
+     * @details Fetch byte. Add X to the fetched value.
+     * Read word using this value to get (Indirect,X) address.
      * @attention Increments cycles count by 4. Increments PC.
-     * @attention Extra cycles count increment if a page cross is detected.
+     * @addressing (Indirect,X)
+     * @see FetchByte
+     * @see ReadWord
+     * @param memory Memory struct instance.
+     * @return (Indirect,X) address.
+     */
+    FORCE_INLINE WORD GetIndXAddress(const Memory &memory) {
+        const BYTE baseAddress = FetchByte(memory) + X;
+        cycles++;
+        return ReadWord(memory, baseAddress);
+    }
+
+    /**
+     * @brief Get (Indirect),Y addressing mode value.
      * @addressing (Indirect),Y
+     * @see GetIndYAddress
      * @param memory Memory struct instance.
      * @return (Indirect),Y address value.
      */
-    FORCE_INLINE BYTE GetIndYAddressValue(const Memory& memory, bool shouldCheckPageCross = true) {
-        const WORD TargetAddress = GetIndYAddress(memory, shouldCheckPageCross);
-        return ReadByte(memory, TargetAddress);
+    FORCE_INLINE BYTE GetIndYAddressValue(const Memory &memory, bool shouldCheckPageCross = true) {
+        const WORD effectiveAddress = GetIndYAddress(memory, shouldCheckPageCross);
+        return ReadByte(memory, effectiveAddress);
     }
 
     /**
-     * @brief Convert StackPointer (BYTE) to Address (WORD).
-     * @return Converted WORD address.
+     * @brief Get (Indirect),Y addressing mode address.
+     * @details Fetch byte. Read word using fetched byte to get effective address.
+     * Add Y to the effective address to get (Indirect),Y address.
+     * @attention Increments cycles count by 3. Increments PC.
+     * Extra cycles count increment if a page cross is detected.
+     * Extra cycles is not applied for EOR/STA instructions
+     * @addressing (Indirect),Y
+     * @see FetchByte
+     * @see ReadWord
+     * @param memory Memory struct instance.
+     * @return (Indirect),Y address.
+     */
+    FORCE_INLINE WORD GetIndYAddress(const Memory &memory, bool shouldCheckPageCross = true) {
+        const BYTE baseAddressPtr = FetchByte(memory);
+        const WORD baseAddress = ReadWord(memory, baseAddressPtr);
+        const WORD effectiveAddress = baseAddress + Y;
+        if (shouldCheckPageCross && IsPageCrossed(effectiveAddress, baseAddress))
+            cycles++;
+        return effectiveAddress;
+    }
+
+/** @} */ // end of addressing
+
+    /**
+     * @brief Convert Stack Pointer register to address.
+     * @return Converted address.
      */
     [[nodiscard]] FORCE_INLINE WORD StackPointerToAddress() const noexcept {
         return 0x100 + SP;

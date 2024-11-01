@@ -2,48 +2,52 @@
 #include "MOS6502/MOS6502.h"
 
 /**
- * @instruction Clear Flag (generic)
+ * @brief Clear Flag Implementation
  * @details Clear target status flag.
  * @param cpu MOS6502 struct instance.
  * @param statusFlag Status flag to clear.
  */
-FORCE_INLINE void GenericCL(MOS6502 &cpu, const BYTE statusFlag) {
-    cpu.Status.SetStatusFlagValue(statusFlag, false);
+FORCE_INLINE void PerformCL(MOS6502 &cpu, const BYTE statusFlag) {
+    cpu.Status.SetStatusBit(statusFlag, false);
     cpu.cycles++;
 }
 
 /**
- * @instruction Clear Carry Flag – Implied
+ * @brief Clear Carry Flag
+ * @addressing Implied
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CLC_IMPL(Memory &memory, MOS6502 &cpu) {
-    GenericCL(cpu, MOS6502_Status_C);
+    PerformCL(cpu, MOS6502_Status_C);
 }
 
 /**
- * @instruction Clear Decimal Flag – Implied
+ * @brief Clear Decimal Flag
+ * @addressing Implied
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CLD_IMPL(Memory &memory, MOS6502 &cpu) {
-    GenericCL(cpu, MOS6502_Status_D);
+    PerformCL(cpu, MOS6502_Status_D);
 }
 
 /**
- * @instruction Clear Interrupt Flag – Implied
+ * @brief Clear Interrupt Flag
+ * @addressing Implied
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CLI_IMPL(Memory &memory, MOS6502 &cpu) {
-    GenericCL(cpu, MOS6502_Status_I);
+    PerformCL(cpu, MOS6502_Status_I);
 }
 
 /**
- * @instruction Clear Overflow Flag – Implied
+ * @brief Clear Overflow Flag
+ * @addressing Implied
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CLV_IMPL(Memory &memory, MOS6502 &cpu) {
-    GenericCL(cpu, MOS6502_Status_V);
+    PerformCL(cpu, MOS6502_Status_V);
 }

@@ -2,7 +2,7 @@
 #include "MOS6502/MOS6502.h"
 
 /**
- * @instruction Arithmetic Shift Left (generic)
+ * @brief Arithmetic Shift Left Implementation
  * @details This operation shifts all the bits of the accumulator or memory contents one bit left.
  * Bit 0 is set to 0 and bit 7 is placed in the carry flag.
  * The effect of this operation is to multiply the memory contents by 2 (ignoring 2's complement considerations),
@@ -10,10 +10,9 @@
  * @short A,Z,C,N = M*2 or M,Z,C,N = M*2
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param memoryValue Value to shift.
  * @param address Address to write back shifted value.
  */
-FORCE_INLINE void GenericASL(Memory &memory, MOS6502 &cpu, const WORD address) {
+FORCE_INLINE void PerformASL(Memory &memory, MOS6502 &cpu, const WORD address) {
     BYTE memoryValue = cpu.ReadByte(memory, address);
     const bool carry = memoryValue & (1 << 7);
     memoryValue <<= 1;
@@ -24,8 +23,8 @@ FORCE_INLINE void GenericASL(Memory &memory, MOS6502 &cpu, const WORD address) {
 }
 
 /**
- * @instruction Arithmetic Shift Left Accumulator
- * @details Same as GenericASL, but with Accumulator as target.
+ * @brief Arithmetic Shift Left Accumulator
+ * @details Same as PerformASL, but with Accumulator as target.
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -38,41 +37,45 @@ void MOS6502_ASL_ACC(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Arithmetic Shift Left – Zero Page
+ * @brief Arithmetic Shift Left
+ * @addressing Zero Page
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ASL_ZP(Memory &memory, MOS6502 &cpu) {
     const BYTE address = cpu.FetchByte(memory);
-    GenericASL(memory, cpu, address);
+    PerformASL(memory, cpu, address);
 }
 
 /**
- * @instruction Arithmetic Shift Left – Zero Page,X
+ * @brief Arithmetic Shift Left
+ * @addressing Zero Page,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ASL_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE address = cpu.GetZeroPageAddress(memory, cpu.X);
-    GenericASL(memory, cpu, address);
+    const BYTE address = cpu.GetZeroPageIndexedAddress(memory, cpu.X);
+    PerformASL(memory, cpu, address);
 }
 
 /**
- * @instruction Arithmetic Shift Left – Absolute
+ * @brief Arithmetic Shift Left
+ * @addressing Absolute
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ASL_ABS(Memory &memory, MOS6502 &cpu) {
     const WORD address = cpu.FetchWord(memory);
-    GenericASL(memory, cpu, address);
+    PerformASL(memory, cpu, address);
 }
 
 /**
- * @instruction Arithmetic Shift Left – Absolute,X
+ * @brief Arithmetic Shift Left
+ * @addressing Absolute,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ASL_ABSX(Memory &memory, MOS6502 &cpu) {
-    const WORD address = cpu.GetAbsAddress(memory, cpu.X, false);
-    GenericASL(memory, cpu, address);
+    const WORD address = cpu.GetAbsIndexedAddress(memory, cpu.X, false);
+    PerformASL(memory, cpu, address);
 }

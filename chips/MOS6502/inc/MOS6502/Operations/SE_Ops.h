@@ -2,18 +2,19 @@
 #include "MOS6502/MOS6502.h"
 
 /**
- * @instruction Set Flag (generic)
+ * @brief Set Flag Implementation
  * @details Set the target flag to one.
  * @param cpu MOS6502 struct instance.
  * @param statusFlag Status flag to set.
  */
 FORCE_INLINE void GenericSE(MOS6502 &cpu, const BYTE statusFlag) {
-    cpu.Status.SetStatusFlagValue(statusFlag, true);
+    cpu.Status.SetStatusBit(statusFlag, true);
     cpu.cycles++;
 }
 
 /**
- * @instruction Set Carry Flag – Implied
+ * @brief Set Carry Flag
+ * @addressing Implied
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -22,7 +23,8 @@ void MOS6502_SEC_IMPL(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Set Decimal Flag – Implied
+ * @brief Set Decimal Flag
+ * @addressing Implied
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -31,7 +33,8 @@ void MOS6502_SED_IMPL(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Set Interrupt Disable Flag – Implied
+ * @brief Set Interrupt Disable Flag
+ * @addressing Implied
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */

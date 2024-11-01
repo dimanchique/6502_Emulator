@@ -2,8 +2,8 @@
 #include "LD_Ops.h"
 
 /**
- * @instruction Load X Register – Immediate
- * @short X,Z,N = M
+ * @brief Load X Register
+ * @addressing Immediate
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -12,8 +12,8 @@ void MOS6502_LDX_IM(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Load X Register – Zero Page
- * @short X,Z,N = M
+ * @brief Load X Register
+ * @addressing Zero Page
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -22,18 +22,18 @@ void MOS6502_LDX_ZP(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Load X Register – Zero Page,Y
- * @short X,Z,N = M
+ * @brief Load X Register
+ * @addressing Zero Page,Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDX_ZPY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ZP(memory, cpu, cpu.X, cpu.Y);
+    MOS6502_LD_ZP_Indexed(memory, cpu, cpu.X, cpu.Y);
 }
 
 /**
- * @instruction Load X Register – Absolute
- * @short X,Z,N = M
+ * @brief Load X Register
+ * @addressing Absolute
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -42,11 +42,11 @@ void MOS6502_LDX_ABS(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Load X Register – Absolute,Y
- * @short X,Z,N = M
+ * @brief Load X Register
+ * @addressing Absolute,Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDX_ABSY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ABS(memory, cpu, cpu.X, cpu.Y);
+    MOS6502_LD_ABS_Indexed(memory, cpu, cpu.X, cpu.Y);
 }

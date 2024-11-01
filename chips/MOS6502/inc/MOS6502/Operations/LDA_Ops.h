@@ -2,8 +2,8 @@
 #include "LD_Ops.h"
 
 /**
- * @instruction Load Accumulator – Immediate
- * @short A,Z,N = M
+ * @brief Load Accumulator
+ * @addressing Immediate
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -12,8 +12,8 @@ void MOS6502_LDA_IM(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Load Accumulator – Zero Page
- * @short A,Z,N = M
+ * @brief Load Accumulator
+ * @addressing Zero Page
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -22,18 +22,18 @@ void MOS6502_LDA_ZP(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Load Accumulator – Zero Page,X
- * @short A,Z,N = M
+ * @brief Load Accumulator
+ * @addressing Zero Page,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_ZPX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ZP(memory, cpu, cpu.A, cpu.X);
+    MOS6502_LD_ZP_Indexed(memory, cpu, cpu.A, cpu.X);
 }
 
 /**
- * @instruction Load Accumulator – Absolute
- * @short A,Z,N = M
+ * @brief Load Accumulator
+ * @addressing Absolute
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -42,43 +42,43 @@ void MOS6502_LDA_ABS(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Load Accumulator – Absolute,X
- * @short A,Z,N = M
+ * @brief Load Accumulator
+ * @addressing Absolute,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_ABSX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ABS(memory, cpu, cpu.A, cpu.X);
+    MOS6502_LD_ABS_Indexed(memory, cpu, cpu.A, cpu.X);
 }
 
 /**
- * @instruction Load Accumulator – Absolute,Y
- * @short A,Z,N = M
+ * @brief Load Accumulator
+ * @addressing Absolute,Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_ABSY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ABS(memory, cpu, cpu.A, cpu.Y);
+    MOS6502_LD_ABS_Indexed(memory, cpu, cpu.A, cpu.Y);
 }
 
 /**
- * @instruction Load Accumulator – (Indirect,X)
- * @short A,Z,N = M
+ * @brief Load Accumulator
+ * @addressing (Indirect,X)
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_INDX(Memory &memory, MOS6502 &cpu) {
     const BYTE data = cpu.GetIndXAddressValue(memory);
-    GenericLD(cpu, cpu.A, data);
+    PerformLD(cpu, cpu.A, data);
 }
 
 /**
- * @instruction Load Accumulator – (Indirect),Y
- * @short A,Z,N = M
+ * @brief Load Accumulator
+ * @addressing (Indirect),Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_INDY(Memory &memory, MOS6502 &cpu) {
     const BYTE data = cpu.GetIndYAddressValue(memory);
-    GenericLD(cpu, cpu.A, data);
+    PerformLD(cpu, cpu.A, data);
 }

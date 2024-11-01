@@ -2,7 +2,7 @@
 #include "MOS6502/MOS6502.h"
 
 /**
- * @instruction Subtract with Carry (generic)
+ * @brief Subtract with Carry Implementation
  * @details This instruction subtracts the contents of a memory location to the accumulator
  * together with the not of the carry bit.
  * If overflow occurs the carry bit is clear, this enables multiple byte subtraction to be performed.
@@ -10,91 +10,99 @@
  * @param cpu MOS6502 struct instance.
  * @param value Value to subtract.
  */
-FORCE_INLINE void GenericSBC(MOS6502 &cpu, const BYTE value) {
+FORCE_INLINE void PerformSBC(MOS6502 &cpu, const BYTE value) {
     const bool signBitsMatch = !((cpu.A ^ value) & MOS6502_Status_N);
     const WORD subRes = cpu.A - value - (1 - cpu.Status.C);
     cpu.A = subRes;
     cpu.Status.UpdateStatusByValue(cpu.A, MOS6502_Status_Z | MOS6502_Status_N);
-    cpu.Status.SetStatusFlagValue(MOS6502_Status_C, subRes > 0xFF);
-    cpu.Status.SetStatusFlagValue(MOS6502_Status_V, signBitsMatch && ((cpu.A ^ value) & MOS6502_Status_N));
+    cpu.Status.SetStatusBit(MOS6502_Status_C, subRes > 0xFF);
+    cpu.Status.SetStatusBit(MOS6502_Status_V, signBitsMatch && ((cpu.A ^ value) & MOS6502_Status_N));
 }
 
 /**
- * @instruction Subtract with Carry – Immediate
+ * @brief Subtract with Carry
+ * @addressing Immediate
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_IM(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.FetchByte(memory);
-    GenericSBC(cpu, value);
+    PerformSBC(cpu, value);
 }
 
 /**
- * @instruction Subtract with Carry – Zero Page
+ * @brief Subtract with Carry
+ * @addressing Zero Page
  * @param memory Memory struct instance
  * @param cpu MOS6502 struct instance
  */
 void MOS6502_SBC_ZP(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetZeroPageValue(memory);
-    GenericSBC(cpu, value);
+    PerformSBC(cpu, value);
 }
 
 /**
- * @instruction Subtract with Carry – Zero Page,X
+ * @brief Subtract with Carry
+ * @addressing Zero Page,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetZeroPageValue(memory, cpu.X);
-    GenericSBC(cpu, value);
+    const BYTE value = cpu.GetZeroPageIndexedValue(memory, cpu.X);
+    PerformSBC(cpu, value);
 }
 
 /**
- * @instruction Subtract with Carry – Absolute
+ * @brief Subtract with Carry
+ * @addressing Absolute
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_ABS(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetAbsValue(memory);
-    GenericSBC(cpu, value);
+    PerformSBC(cpu, value);
 }
 
 /**
- * @instruction Subtract with Carry – Absolute,X
+ * @brief Subtract with Carry
+ * @addressing Absolute,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_ABSX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetAbsValue(memory, cpu.X);
-    GenericSBC(cpu, value);
+    const BYTE value = cpu.GetAbsIndexedValue(memory, cpu.X);
+    PerformSBC(cpu, value);
 }
 
 /**
- * @instruction Subtract with Carry – Absolute,Y
+ * @brief Subtract with Carry
+ * @addressing Absolute,Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_ABSY(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetAbsValue(memory, cpu.Y);
-    GenericSBC(cpu, value);
+    const BYTE value = cpu.GetAbsIndexedValue(memory, cpu.Y);
+    PerformSBC(cpu, value);
 }
 
 /**
- * @instruction Subtract with Carry – (Indirect,X)
+ * @brief Subtract with Carry
+ * @addressing (Indirect,X)
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_INDX(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetIndXAddressValue(memory);
-    GenericSBC(cpu, value);
+    PerformSBC(cpu, value);
 }
 
 /**
- * @instruction Subtract with Carry – (Indirect),Y
+ * @brief Subtract with Carry
+ * @addressing (Indirect),Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_INDY(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetIndYAddressValue(memory);
-    GenericSBC(cpu, value);
+    PerformSBC(cpu, value);
 }

@@ -5,6 +5,12 @@
 #include <iostream>
 #include <fstream>
 
+/**
+ * @class Compute
+ * @brief Base class for CPU
+ * @details Compute contains base functionality for each CPU: Run, Reset and Load ROM.
+ * Also, Compute holds cycles counter
+ */
 class Compute {
     public:
     /**
@@ -37,11 +43,10 @@ class Compute {
     }
 
     /**
-     * @brief Load data into memory from a binary file and a specified starting address.
+     * @brief Load data into memory from a binary file
      * @param filename Path to the binary file.
      * @param memory Memory struct instance.
-     * @param startingAddress Starting address to write the binary.
-     * @return True if the load was successful; otherwise, false.
+     * @return True if the load was successful, false otherwise.
      */
     bool LoadROM(const char *filename, Memory &memory) {
         long long numBytesRead = 0;
@@ -67,8 +72,7 @@ protected:
     virtual U32 Run(Memory &memory) = 0;
 
     /**
-     * @brief Resets CPU registers and Stack Pointer to their default values.
-     * The Program Counter value after reset depends on the ResetVector value.
+     * @brief Resets CPU to its default values.
      * @param memory Memory struct instance.
      */
     virtual void Reset(Memory &memory) noexcept = 0;

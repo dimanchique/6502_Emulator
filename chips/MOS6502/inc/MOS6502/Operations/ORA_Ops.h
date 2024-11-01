@@ -2,102 +2,111 @@
 #include "MOS6502/MOS6502.h"
 
 /**
- * @instruction Logical Inclusive OR (generic)
+ * @brief Logical Inclusive OR Implementation
  * @details An inclusive OR is performed, bit by bit, on the accumulator contents using the contents of a byte of memory.
  * @short A,Z,N = A|M
  * @param cpu MOS6502 struct instance.
  * @param value Value to perform OR with register A.
  */
-FORCE_INLINE void GenericORA(MOS6502 &cpu, const BYTE value) {
+FORCE_INLINE void PerformORA(MOS6502 &cpu, const BYTE value) {
     cpu.A |= value;
     cpu.Status.UpdateStatusByValue(cpu.A, MOS6502_Status_Z | MOS6502_Status_N);
 }
 
 /**
- * @instruction Logical Inclusive OR – Immediate
+ * @brief Logical Inclusive OR
+ * @addressing Immediate
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ORA_IM(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.FetchByte(memory);
-    GenericORA(cpu, value);
+    PerformORA(cpu, value);
 }
 
 /**
- * @instruction Logical Inclusive OR – Zero Page
+ * @brief Logical Inclusive OR
+ * @addressing Zero Page
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ORA_ZP(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetZeroPageValue(memory);
-    GenericORA(cpu, value);
+    PerformORA(cpu, value);
 }
 
 /**
- * @instruction Logical Inclusive OR – Zero Page,X
+ * @brief Logical Inclusive OR
+ * @addressing Zero Page,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ORA_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetZeroPageValue(memory, cpu.X);
-    GenericORA(cpu, value);
+    const BYTE value = cpu.GetZeroPageIndexedValue(memory, cpu.X);
+    PerformORA(cpu, value);
 }
 
 /**
- * @instruction Logical Inclusive OR – Absolute
+ * @brief Logical Inclusive OR
+ * @addressing Absolute
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ORA_ABS(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetAbsValue(memory);
-    GenericORA(cpu, value);
+    PerformORA(cpu, value);
 }
 
 /**
- * @instruction Logical Inclusive OR – Absolute (generic)
+ * @brief Logical Inclusive OR (generic)
+ * @addressing Absolute Indexed
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param affectingRegister Register value used as offset.
+ * @param offsetValue Address offset value.
  */
-FORCE_INLINE void MOS6502_ORA_ABS(Memory &memory, MOS6502 &cpu, BYTE affectingRegister) {
-    const BYTE value = cpu.GetAbsValue(memory, affectingRegister);
-    GenericORA(cpu, value);
+FORCE_INLINE void MOS6502_ORA_ABS_Indexed(Memory &memory, MOS6502 &cpu, BYTE offsetValue) {
+    const BYTE value = cpu.GetAbsIndexedValue(memory, offsetValue);
+    PerformORA(cpu, value);
 }
 
 /**
- * @instruction Logical Inclusive OR – Absolute,X
+ * @brief Logical Inclusive OR
+ * @addressing Absolute,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ORA_ABSX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ORA_ABS(memory, cpu, cpu.X);
+    MOS6502_ORA_ABS_Indexed(memory, cpu, cpu.X);
 }
 
 /**
- * @instruction Logical Inclusive OR – Absolute,Y
+ * @brief Logical Inclusive OR
+ * @addressing Absolute,Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ORA_ABSY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ORA_ABS(memory, cpu, cpu.Y);
+    MOS6502_ORA_ABS_Indexed(memory, cpu, cpu.Y);
 }
 
 /**
- * @instruction Logical Inclusive OR – (Indirect,X)
+ * @brief Logical Inclusive OR
+ * @addressing (Indirect,X)
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ORA_INDX(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetIndXAddressValue(memory);
-    GenericORA(cpu, value);
+    PerformORA(cpu, value);
 }
 
 /**
- * @instruction Logical Inclusive OR – (Indirect),Y
+ * @brief Logical Inclusive OR
+ * @addressing (Indirect),Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ORA_INDY(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetIndYAddressValue(memory);
-    GenericORA(cpu, value);
+    PerformORA(cpu, value);
 }

@@ -2,7 +2,8 @@
 #include "CM_Ops.h"
 
 /**
- * @instruction Compare register Y – Immediate
+ * @brief Compare register Y
+ * @addressing Immediate
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -11,7 +12,8 @@ void MOS6502_CPY_IM(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Compare register Y – Zero Page
+ * @brief Compare register Y
+ * @addressing Zero Page
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -20,7 +22,8 @@ void MOS6502_CPY_ZP(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Compare register Y – Absolute
+ * @brief Compare register Y
+ * @addressing Absolute
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */

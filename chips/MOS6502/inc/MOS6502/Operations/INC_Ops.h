@@ -2,15 +2,14 @@
 #include "MOS6502/MOS6502.h"
 
 /**
- * @instruction Increment Memory (generic)
+ * @brief Increment Memory Implementation
  * @details Adds one to the value held at a specified memory location setting the zero and negative flags as appropriate.
  * @short M,Z,N = M+1
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param memoryValue Memory value to increment.
  * @param address Address to write back modified value.
  */
-FORCE_INLINE void GenericINC(Memory &memory, MOS6502 &cpu, const WORD address) {
+FORCE_INLINE void PerformINC(Memory &memory, MOS6502 &cpu, const WORD address) {
     BYTE memoryValue = cpu.ReadByte(memory, address);
     memoryValue++;
     cpu.cycles++;
@@ -19,47 +18,52 @@ FORCE_INLINE void GenericINC(Memory &memory, MOS6502 &cpu, const WORD address) {
 }
 
 /**
- * @instruction Increment Memory – Zero Page
+ * @brief Increment Memory
+ * @addressing Zero Page
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_INC_ZP(Memory &memory, MOS6502 &cpu) {
     const BYTE address = cpu.FetchByte(memory);
-    GenericINC(memory, cpu, address);
+    PerformINC(memory, cpu, address);
 }
 
 /**
- * @instruction Increment Memory – Zero Page,X
+ * @brief Increment Memory
+ * @addressing Zero Page,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_INC_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE address = cpu.GetZeroPageAddress(memory, cpu.X);
-    GenericINC(memory, cpu, address);
+    const BYTE address = cpu.GetZeroPageIndexedAddress(memory, cpu.X);
+    PerformINC(memory, cpu, address);
 }
 
 /**
- * @instruction Increment Memory – Absolute
+ * @brief Increment Memory
+ * @addressing Absolute
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_INC_ABS(Memory &memory, MOS6502 &cpu) {
     const WORD address = cpu.FetchWord(memory);
-    GenericINC(memory, cpu, address);
+    PerformINC(memory, cpu, address);
 }
 
 /**
- * @instruction Increment Memory – Absolute,X
+ * @brief Increment Memory
+ * @addressing Absolute,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_INC_ABSX(Memory &memory, MOS6502 &cpu) {
-    const WORD address = cpu.GetAbsAddress(memory, cpu.X, false);
-    GenericINC(memory, cpu, address);
+    const WORD address = cpu.GetAbsIndexedAddress(memory, cpu.X, false);
+    PerformINC(memory, cpu, address);
 }
 
 /**
- * @instruction Increment X Register – Implied
+ * @brief Increment X Register
+ * @addressing Implied
  * @short X,Z,N = X+1
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
@@ -71,7 +75,8 @@ void MOS6502_INX_IMPL(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Increment Y Register – Implied
+ * @brief Increment Y Register
+ * @addressing Implied
  * @short Y,Z,N = Y+1
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.

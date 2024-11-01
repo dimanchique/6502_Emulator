@@ -4,7 +4,7 @@ class MOS6502_CLFixture : public MOS6502_TestFixture {
 public:
     void CL_CanClearFlag(MOS6502_OpCodes opcode, BYTE statusFlag) {
         // given:
-        cpu.Status.SetStatusFlagValue(statusFlag, true);
+        cpu.Status.SetStatusBit(statusFlag, true);
         mem[0xFFFC] = 0x00;
         mem[0xFFFD] = 0xFF;
         mem[0xFF00] = opcode;
@@ -16,7 +16,7 @@ public:
         cyclesPassed = cpu.Run(mem);
 
         // then:
-        EXPECT_FALSE(cpu.Status.GetStatusValue(statusFlag));
+        EXPECT_FALSE(cpu.Status.GetStatusBit(statusFlag));
         CheckCyclesCount();
     }
 };

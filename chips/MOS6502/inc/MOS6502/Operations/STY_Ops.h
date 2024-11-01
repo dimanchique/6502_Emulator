@@ -2,9 +2,9 @@
 #include "ST_Ops.h"
 
 /**
- * @instruction Store Y Register – Zero Page
+ * @brief Store Y Register
+ * @addressing Zero Page
  * @details Stores the contents of the Y register into memory.
- * @short M = Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -13,9 +13,9 @@ void MOS6502_STY_ZP(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Store Y Register – Zero Page,X
+ * @brief Store Y Register
+ * @addressing Zero Page,X
  * @details Stores the contents of the Y register into memory.
- * @short M = Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
@@ -24,9 +24,9 @@ void MOS6502_STY_ZPX(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Store Y Register – Absolute
+ * @brief Store Y Register
+ * @addressing Absolute
  * @details Stores the contents of the Y register into memory.
- * @short M = Y
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */

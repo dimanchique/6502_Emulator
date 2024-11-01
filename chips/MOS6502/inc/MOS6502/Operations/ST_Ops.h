@@ -2,11 +2,13 @@
 #include "MOS6502/MOS6502.h"
 
 /**
- * @instruction Store (generic) – Zero Page
+ * @brief Store (generic)
+ * @addressing Zero Page
  * @details Stores the contents of the targetRegister into memory.
+ * @short M = (A/X/Y)
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param targetRegister Register to store.
+ * @param targetRegister Register to store from.
  */
 FORCE_INLINE void MOS6502_ST_ZP(Memory &memory, MOS6502 &cpu, BYTE &targetRegister) {
     const BYTE targetAddress = cpu.FetchByte(memory);
@@ -14,24 +16,28 @@ FORCE_INLINE void MOS6502_ST_ZP(Memory &memory, MOS6502 &cpu, BYTE &targetRegist
 }
 
 /**
- * @instruction Store (generic) – Zero Page (generic)
+ * @brief Store (generic)
+ * @addressing Zero Page Indexed
  * @details Stores the contents of the targetRegister into memory.
+ * @short M = (A/X/Y)
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param targetRegister Register to store.
- * @param affectingRegister Address offset register.
+ * @param targetRegister Register to store from.
+ * @param offsetValue Address offset value.
  */
-FORCE_INLINE void MOS6502_ST_ZP(Memory &memory, MOS6502 &cpu, BYTE &targetRegister, BYTE affectingRegister) {
-    const BYTE targetAddress = cpu.GetZeroPageAddress(memory, affectingRegister);
+FORCE_INLINE void MOS6502_ST_ZP(Memory &memory, MOS6502 &cpu, BYTE &targetRegister, BYTE offsetValue) {
+    const BYTE targetAddress = cpu.GetZeroPageIndexedAddress(memory, offsetValue);
     cpu.WriteByte(memory, targetRegister, targetAddress);
 }
 
 /**
- * @instruction Store (generic) – Absolute
+ * @brief Store (generic)
+ * @addressing Absolute
  * @details Stores the contents of the targetRegister into memory.
+ * @short M = (A/X/Y)
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param targetRegister Register to store.
+ * @param targetRegister Register to store from.
  */
 FORCE_INLINE void MOS6502_ST_ABS(Memory &memory, MOS6502 &cpu, BYTE &targetRegister) {
     const WORD targetAddress = cpu.FetchWord(memory);
@@ -39,14 +45,16 @@ FORCE_INLINE void MOS6502_ST_ABS(Memory &memory, MOS6502 &cpu, BYTE &targetRegis
 }
 
 /**
- * @instruction Store (generic) – Absolute (generic)
+ * @brief Store (generic)
+ * @addressing Absolute (generic)
  * @details Stores the contents of the targetRegister into memory.
+ * @short M = (A/X/Y)
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param targetRegister Register to store.
- * @param affectingRegister Address offset register.
+ * @param targetRegister Register to store from.
+ * @param offsetValue Address offset value.
  */
-FORCE_INLINE void MOS6502_ST_ABS(Memory &memory, MOS6502 &cpu, BYTE &targetRegister, BYTE affectingRegister) {
-    const WORD targetAddress = cpu.GetAbsAddress(memory, affectingRegister, false);
+FORCE_INLINE void MOS6502_ST_ABS(Memory &memory, MOS6502 &cpu, BYTE &targetRegister, BYTE offsetValue) {
+    const WORD targetAddress = cpu.GetAbsIndexedAddress(memory, offsetValue, false);
     cpu.WriteByte(memory, targetRegister, targetAddress);
 }

@@ -2,7 +2,7 @@
 #include "MOS6502/MOS6502.h"
 
 /**
- * @instruction Bit Test (generic)
+ * @brief Bit Test Implementation
  * @details This instructions is used to test if one or more bits are set in a target memory location.
  * The mask pattern in A is ANDed with the value in memory to set or clear the zero flag, but the result is not kept.
  * Bits 7 and 6 of the value from memory are copied into the N and V flags.
@@ -10,7 +10,7 @@
  * @param cpu MOS6502 struct instance.
  * @param mask Value to do BitTest.
  */
-FORCE_INLINE void GenericBIT(MOS6502 &cpu, const BYTE mask) {
+FORCE_INLINE void PerformBIT(MOS6502 &cpu, const BYTE mask) {
     const BYTE value = cpu.A & mask;
     cpu.Status.Z = value == 0;
     cpu.Status.V = (mask >> 6) & 1;
@@ -18,21 +18,23 @@ FORCE_INLINE void GenericBIT(MOS6502 &cpu, const BYTE mask) {
 }
 
 /**
- * @instruction Bit Test – Zero Page
+ * @brief Bit Test
+ * @addressing Zero Page
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_BIT_ZP(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetZeroPageValue(memory);
-    GenericBIT(cpu, value);
+    PerformBIT(cpu, value);
 }
 
 /**
- * @instruction Bit Test – Absolute
+ * @brief Bit Test
+ * @addressing Absolute
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_BIT_ABS(Memory &memory, MOS6502 &cpu) {
     const BYTE value = cpu.GetAbsValue(memory);
-    GenericBIT(cpu, value);
+    PerformBIT(cpu, value);
 }

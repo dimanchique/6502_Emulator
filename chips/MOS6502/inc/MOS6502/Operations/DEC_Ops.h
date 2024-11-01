@@ -2,16 +2,15 @@
 #include "MOS6502/MOS6502.h"
 
 /**
- * @instruction Decrement Memory (generic)
+ * @brief Decrement Memory Implementation
  * @details Subtracts one from the value held at a specified memory location
  * setting the zero and negative flags as appropriate.
  * @short M,Z,N = M-1
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param memoryValue Memory value to decrement.
- * @param address Address to write back modified value .
+ * @param address Address to write back modified value.
  */
-FORCE_INLINE void GenericDEC(Memory &memory, MOS6502 &cpu, const WORD address) {
+FORCE_INLINE void PerformDEC(Memory &memory, MOS6502 &cpu, const WORD address) {
     BYTE memoryValue = cpu.ReadByte(memory, address);
     memoryValue--;
     cpu.cycles++;
@@ -20,47 +19,52 @@ FORCE_INLINE void GenericDEC(Memory &memory, MOS6502 &cpu, const WORD address) {
 }
 
 /**
- * @instruction Decrement Memory – Zero Page
+ * @brief Decrement Memory
+ * @addressing Zero Page
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_DEC_ZP(Memory &memory, MOS6502 &cpu) {
     const BYTE address = cpu.FetchByte(memory);
-    GenericDEC(memory, cpu, address);
+    PerformDEC(memory, cpu, address);
 }
 
 /**
- * @instruction Decrement Memory – Zero Page,X
+ * @brief Decrement Memory
+ * @addressing Zero Page,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_DEC_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE address = cpu.GetZeroPageAddress(memory, cpu.X);
-    GenericDEC(memory, cpu, address);
+    const BYTE address = cpu.GetZeroPageIndexedAddress(memory, cpu.X);
+    PerformDEC(memory, cpu, address);
 }
 
 /**
- * @instruction Decrement Memory – Absolute
+ * @brief Decrement Memory
+ * @addressing Absolute
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_DEC_ABS(Memory &memory, MOS6502 &cpu) {
     const WORD address = cpu.FetchWord(memory);
-    GenericDEC(memory, cpu, address);
+    PerformDEC(memory, cpu, address);
 }
 
 /**
- * @instruction Decrement Memory – Absolute,X
+ * @brief Decrement Memory
+ * @addressing Absolute,X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_DEC_ABSX(Memory &memory, MOS6502 &cpu) {
-    const WORD address = cpu.GetAbsAddress(memory, cpu.X, false);
-    GenericDEC(memory, cpu, address);
+    const WORD address = cpu.GetAbsIndexedAddress(memory, cpu.X, false);
+    PerformDEC(memory, cpu, address);
 }
 
 /**
- * @instruction Decrement X Register – Implied
+ * @brief Decrement X Register
+ * @addressing Implied
  * @short X,Z,N = X-1
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
@@ -72,7 +76,8 @@ void MOS6502_DEX_IMPL(Memory &memory, MOS6502 &cpu) {
 }
 
 /**
- * @instruction Decrement Y Register – Implied
+ * @brief Decrement Y Register
+ * @addressing Implied
  * @short Y,Z,N = Y-1
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
