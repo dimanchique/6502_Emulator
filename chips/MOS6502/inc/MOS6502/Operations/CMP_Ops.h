@@ -8,7 +8,7 @@
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CMP_IM(Memory &memory, MOS6502 &cpu) {
-    MOS6502_CM_IM(memory, cpu, cpu.A);
+    PerformCMP(memory, cpu, MOS6502_AddressingMode::Immediate);
 }
 
 /**
@@ -18,7 +18,7 @@ void MOS6502_CMP_IM(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CMP_ZP(Memory &memory, MOS6502 &cpu) {
-    MOS6502_CM_ZP(memory, cpu, cpu.A);
+    PerformCMP(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -28,7 +28,7 @@ void MOS6502_CMP_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CMP_ZPX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_CM_ZPX(memory, cpu, cpu.A);
+    PerformCMP(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -38,7 +38,7 @@ void MOS6502_CMP_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CMP_ABS(Memory &memory, MOS6502 &cpu) {
-    MOS6502_CM_ABS(memory, cpu, cpu.A);
+    PerformCMP(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -48,7 +48,7 @@ void MOS6502_CMP_ABS(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CMP_ABSX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_CM_ABS_Indexed(memory, cpu, cpu.A, cpu.X);
+    PerformCMP(memory, cpu, MOS6502_AddressingMode::Absolute_X);
 }
 
 /**
@@ -58,7 +58,7 @@ void MOS6502_CMP_ABSX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CMP_ABSY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_CM_ABS_Indexed(memory, cpu, cpu.A, cpu.Y);
+    PerformCMP(memory, cpu, MOS6502_AddressingMode::Absolute_Y);
 }
 
 /**
@@ -68,8 +68,7 @@ void MOS6502_CMP_ABSY(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CMP_INDX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetIndXAddressValue(memory);
-    PerformCM(cpu, cpu.A, value);
+    PerformCMP(memory, cpu, MOS6502_AddressingMode::Indirect_X);
 }
 
 /**
@@ -79,6 +78,5 @@ void MOS6502_CMP_INDX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_CMP_INDY(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetIndYAddressValue(memory);
-    PerformCM(cpu, cpu.A, value);
+    PerformCMP(memory, cpu, MOS6502_AddressingMode::Indirect_Y);
 }

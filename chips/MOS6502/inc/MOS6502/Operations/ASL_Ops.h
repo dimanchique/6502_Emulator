@@ -10,9 +10,12 @@
  * @short A,Z,C,N = M*2 or M,Z,C,N = M*2
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param address Address to write back shifted value.
+ * @param addressing MOS6502 Addressing mode.
+ * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
  */
-FORCE_INLINE void PerformASL(Memory &memory, MOS6502 &cpu, const WORD address) {
+FORCE_INLINE void PerformASL(Memory &memory, MOS6502 &cpu, const MOS6502_AddressingMode addressing, bool shouldCheckPageCross = true) {
+    const WORD address = cpu.GetAddressingModeAddress(memory, addressing, shouldCheckPageCross);
+
     BYTE memoryValue = cpu.ReadByte(memory, address);
     const bool carry = memoryValue & (1 << 7);
     memoryValue <<= 1;
@@ -43,8 +46,7 @@ void MOS6502_ASL_ACC(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ASL_ZP(Memory &memory, MOS6502 &cpu) {
-    const BYTE address = cpu.FetchByte(memory);
-    PerformASL(memory, cpu, address);
+    PerformASL(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -54,8 +56,7 @@ void MOS6502_ASL_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ASL_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE address = cpu.GetZeroPageIndexedAddress(memory, cpu.X);
-    PerformASL(memory, cpu, address);
+    PerformASL(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -65,8 +66,7 @@ void MOS6502_ASL_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ASL_ABS(Memory &memory, MOS6502 &cpu) {
-    const WORD address = cpu.FetchWord(memory);
-    PerformASL(memory, cpu, address);
+    PerformASL(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -76,6 +76,5 @@ void MOS6502_ASL_ABS(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ASL_ABSX(Memory &memory, MOS6502 &cpu) {
-    const WORD address = cpu.GetAbsIndexedAddress(memory, cpu.X, false);
-    PerformASL(memory, cpu, address);
+    PerformASL(memory, cpu, MOS6502_AddressingMode::Absolute_X, false);
 }

@@ -3,58 +3,58 @@
 
 /**
  * @brief Store (generic)
- * @addressing Zero Page
  * @details Stores the contents of the targetRegister into memory.
  * @short M = (A/X/Y)
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  * @param targetRegister Register to store from.
+ * @param addressing MOS6502 Addressing mode.
+ * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
  */
-FORCE_INLINE void MOS6502_ST_ZP(Memory &memory, MOS6502 &cpu, BYTE &targetRegister) {
-    const BYTE targetAddress = cpu.FetchByte(memory);
+FORCE_INLINE void PerformST(Memory &memory, MOS6502 &cpu, const BYTE &targetRegister, const MOS6502_AddressingMode addressing, bool shouldCheckPageCross) {
+    const WORD targetAddress = cpu.GetAddressingModeAddress(memory, addressing, shouldCheckPageCross);
     cpu.WriteByte(memory, targetRegister, targetAddress);
 }
 
 /**
- * @brief Store (generic)
- * @addressing Zero Page Indexed
+ * @brief Store Accumulator
  * @details Stores the contents of the targetRegister into memory.
- * @short M = (A/X/Y)
+ * @short M = A
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param targetRegister Register to store from.
- * @param offsetValue Address offset value.
+ * @param addressing MOS6502 Addressing mode.
+ * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
  */
-FORCE_INLINE void MOS6502_ST_ZP(Memory &memory, MOS6502 &cpu, BYTE &targetRegister, BYTE offsetValue) {
-    const BYTE targetAddress = cpu.GetZeroPageIndexedAddress(memory, offsetValue);
-    cpu.WriteByte(memory, targetRegister, targetAddress);
+FORCE_INLINE void PerformSTA(Memory &memory, MOS6502 &cpu, const MOS6502_AddressingMode addressing, bool shouldCheckPageCross = true){
+    PerformST(memory, cpu, cpu.A, addressing, shouldCheckPageCross);
 }
 
-/**
- * @brief Store (generic)
- * @addressing Absolute
- * @details Stores the contents of the targetRegister into memory.
- * @short M = (A/X/Y)
- * @param memory Memory struct instance.
- * @param cpu MOS6502 struct instance.
- * @param targetRegister Register to store from.
- */
-FORCE_INLINE void MOS6502_ST_ABS(Memory &memory, MOS6502 &cpu, BYTE &targetRegister) {
-    const WORD targetAddress = cpu.FetchWord(memory);
-    cpu.WriteByte(memory, targetRegister, targetAddress);
-}
 
 /**
- * @brief Store (generic)
- * @addressing Absolute (generic)
+ * @brief Store X Register
  * @details Stores the contents of the targetRegister into memory.
- * @short M = (A/X/Y)
+ * @short M = X
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
+ * @param addressing MOS6502 Addressing mode.
+ * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
  * @param targetRegister Register to store from.
- * @param offsetValue Address offset value.
  */
-FORCE_INLINE void MOS6502_ST_ABS(Memory &memory, MOS6502 &cpu, BYTE &targetRegister, BYTE offsetValue) {
-    const WORD targetAddress = cpu.GetAbsIndexedAddress(memory, offsetValue, false);
-    cpu.WriteByte(memory, targetRegister, targetAddress);
+FORCE_INLINE void PerformSTX(Memory &memory, MOS6502 &cpu, const MOS6502_AddressingMode addressing, bool shouldCheckPageCross = true){
+    PerformST(memory, cpu, cpu.X, addressing, shouldCheckPageCross);
+}
+
+
+/**
+ * @brief Store Y Register
+ * @details Stores the contents of the targetRegister into memory.
+ * @short M = Y
+ * @param memory Memory struct instance.
+ * @param cpu MOS6502 struct instance.
+ * @param addressing MOS6502 Addressing mode.
+ * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
+ * @param targetRegister Register to store from.
+ */
+FORCE_INLINE void PerformSTY(Memory &memory, MOS6502 &cpu, const MOS6502_AddressingMode addressing, bool shouldCheckPageCross = true){
+    PerformST(memory, cpu, cpu.Y, addressing, shouldCheckPageCross);
 }

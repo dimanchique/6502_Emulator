@@ -8,9 +8,12 @@
  * @short A,C,Z,N = A/2 or M,C,Z,N = M/2
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param address Address to write back shifted value.
+ * @param addressing MOS6502 Addressing mode.
+ * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
  */
-FORCE_INLINE void PerformLSR(Memory &memory, MOS6502 &cpu, const WORD address) {
+FORCE_INLINE void PerformLSR(Memory &memory, MOS6502 &cpu, const MOS6502_AddressingMode addressing, bool shouldCheckPageCross = true) {
+    const WORD address = cpu.GetAddressingModeAddress(memory, addressing, shouldCheckPageCross);
+
     BYTE memoryValue = cpu.ReadByte(memory, address);
     const bool carry = memoryValue & 1;
     memoryValue >>= 1;
@@ -41,8 +44,7 @@ void MOS6502_LSR_ACC(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LSR_ZP(Memory &memory, MOS6502 &cpu) {
-    const BYTE address = cpu.FetchByte(memory);
-    PerformLSR(memory, cpu, address);
+    PerformLSR(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -52,8 +54,7 @@ void MOS6502_LSR_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LSR_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE address = cpu.GetZeroPageIndexedAddress(memory, cpu.X);
-    PerformLSR(memory, cpu, address);
+    PerformLSR(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -63,8 +64,7 @@ void MOS6502_LSR_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LSR_ABS(Memory &memory, MOS6502 &cpu) {
-    const WORD address = cpu.FetchWord(memory);
-    PerformLSR(memory, cpu, address);
+    PerformLSR(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -74,6 +74,5 @@ void MOS6502_LSR_ABS(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LSR_ABSX(Memory &memory, MOS6502 &cpu) {
-    const WORD address = cpu.GetAbsIndexedAddress(memory, cpu.X, false);
-    PerformLSR(memory, cpu, address);
+    PerformLSR(memory, cpu, MOS6502_AddressingMode::Absolute_X, false);
 }

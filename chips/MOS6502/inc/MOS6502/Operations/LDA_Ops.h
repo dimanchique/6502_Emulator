@@ -8,7 +8,7 @@
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_IM(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_IM(memory, cpu, cpu.A);
+    PerformLDA(memory, cpu, MOS6502_AddressingMode::Immediate);
 }
 
 /**
@@ -18,7 +18,7 @@ void MOS6502_LDA_IM(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_ZP(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ZP(memory, cpu, cpu.A);
+    PerformLDA(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -28,7 +28,7 @@ void MOS6502_LDA_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_ZPX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ZP_Indexed(memory, cpu, cpu.A, cpu.X);
+    PerformLDA(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -38,7 +38,7 @@ void MOS6502_LDA_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_ABS(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ABS(memory, cpu, cpu.A);
+    PerformLDA(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -48,7 +48,7 @@ void MOS6502_LDA_ABS(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_ABSX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ABS_Indexed(memory, cpu, cpu.A, cpu.X);
+    PerformLDA(memory, cpu, MOS6502_AddressingMode::Absolute_X);
 }
 
 /**
@@ -58,7 +58,7 @@ void MOS6502_LDA_ABSX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_ABSY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ABS_Indexed(memory, cpu, cpu.A, cpu.Y);
+    PerformLDA(memory, cpu, MOS6502_AddressingMode::Absolute_Y);
 }
 
 /**
@@ -68,8 +68,7 @@ void MOS6502_LDA_ABSY(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_INDX(Memory &memory, MOS6502 &cpu) {
-    const BYTE data = cpu.GetIndXAddressValue(memory);
-    PerformLD(cpu, cpu.A, data);
+    PerformLDA(memory, cpu, MOS6502_AddressingMode::Indirect_X);
 }
 
 /**
@@ -79,6 +78,5 @@ void MOS6502_LDA_INDX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDA_INDY(Memory &memory, MOS6502 &cpu) {
-    const BYTE data = cpu.GetIndYAddressValue(memory);
-    PerformLD(cpu, cpu.A, data);
+    PerformLDA(memory, cpu, MOS6502_AddressingMode::Indirect_Y);
 }

@@ -6,10 +6,13 @@
  * @details This instruction adds the contents of a memory location to the accumulator together with the carry bit.
  * If overflow occurs the carry bit is set, this enables multiple byte addition to be performed.
  * @short A,Z,C,N = A+M+C
+ * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param value Value to add.
+ * @param addressing MOS6502 Addressing mode.
  */
-FORCE_INLINE void PerformADC(MOS6502 &cpu, const BYTE value) {
+FORCE_INLINE void PerformADC(Memory &memory, MOS6502 &cpu, const MOS6502_AddressingMode addressing) {
+    const BYTE value = cpu.GetAddressingModeValue(memory, addressing);
+
     const bool signBitsMatch = !((cpu.A ^ value) & MOS6502_Status_N);
     const WORD addRes = cpu.A + value + cpu.Status.C;
     cpu.A = addRes;
@@ -25,8 +28,7 @@ FORCE_INLINE void PerformADC(MOS6502 &cpu, const BYTE value) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ADC_IM(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.FetchByte(memory);
-    PerformADC(cpu, value);
+    PerformADC(memory, cpu, MOS6502_AddressingMode::Immediate);
 }
 
 /**
@@ -36,8 +38,7 @@ void MOS6502_ADC_IM(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ADC_ZP(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetZeroPageValue(memory);
-    PerformADC(cpu, value);
+    PerformADC(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -47,8 +48,7 @@ void MOS6502_ADC_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ADC_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetZeroPageIndexedValue(memory, cpu.X);
-    PerformADC(cpu, value);
+    PerformADC(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -58,20 +58,7 @@ void MOS6502_ADC_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ADC_ABS(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetAbsValue(memory);
-    PerformADC(cpu, value);
-}
-
-/**
- * @brief Add with Carry (generic)
- * @addressing Absolute Indexed
- * @param memory Memory struct instance.
- * @param cpu MOS6502 struct instance.
- * @param offsetValue Address offset value.
- */
-FORCE_INLINE void MOS6502_ADC_ABS_Indexed(Memory &memory, MOS6502 &cpu, BYTE offsetValue) {
-    const BYTE value = cpu.GetAbsIndexedValue(memory, offsetValue);
-    PerformADC(cpu, value);
+    PerformADC(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -81,7 +68,7 @@ FORCE_INLINE void MOS6502_ADC_ABS_Indexed(Memory &memory, MOS6502 &cpu, BYTE off
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ADC_ABSX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ADC_ABS_Indexed(memory, cpu, cpu.X);
+    PerformADC(memory, cpu, MOS6502_AddressingMode::Absolute_X);
 }
 
 /**
@@ -91,7 +78,7 @@ void MOS6502_ADC_ABSX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ADC_ABSY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ADC_ABS_Indexed(memory, cpu, cpu.Y);
+    PerformADC(memory, cpu, MOS6502_AddressingMode::Absolute_Y);
 }
 
 /**
@@ -101,8 +88,7 @@ void MOS6502_ADC_ABSY(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ADC_INDX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetIndXAddressValue(memory);
-    PerformADC(cpu, value);
+    PerformADC(memory, cpu, MOS6502_AddressingMode::Indirect_X);
 }
 
 /**
@@ -112,6 +98,5 @@ void MOS6502_ADC_INDX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ADC_INDY(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetIndYAddressValue(memory);
-    PerformADC(cpu, value);
+    PerformADC(memory, cpu, MOS6502_AddressingMode::Indirect_Y);
 }

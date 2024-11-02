@@ -5,10 +5,14 @@
  * @brief Exclusive OR Implementation
  * @details An exclusive OR is performed, bit by bit, on the accumulator contents using the contents of a byte of memory.
  * @short A,Z,N = A^M
+ * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param value Value to perform XOR with register A.
+ * @param addressing MOS6502 Addressing mode.
+ * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
  */
-FORCE_INLINE void PerformEOR(MOS6502 &cpu, const BYTE value) {
+FORCE_INLINE void PerformEOR(Memory &memory, MOS6502 &cpu, const MOS6502_AddressingMode addressing, bool shouldCheckPageCross = true) {
+    const BYTE value = cpu.GetAddressingModeValue(memory, addressing, shouldCheckPageCross);
+
     cpu.A ^= value;
     cpu.Status.UpdateStatusByValue(cpu.A, MOS6502_Status_Z | MOS6502_Status_N);
 }
@@ -20,8 +24,7 @@ FORCE_INLINE void PerformEOR(MOS6502 &cpu, const BYTE value) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_EOR_IM(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.FetchByte(memory);
-    PerformEOR(cpu, value);
+    PerformEOR(memory, cpu, MOS6502_AddressingMode::Immediate);
 }
 
 /**
@@ -31,8 +34,7 @@ void MOS6502_EOR_IM(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_EOR_ZP(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetZeroPageValue(memory);
-    PerformEOR(cpu, value);
+    PerformEOR(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -42,8 +44,7 @@ void MOS6502_EOR_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_EOR_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetZeroPageIndexedValue(memory, cpu.X);
-    PerformEOR(cpu, value);
+    PerformEOR(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -53,20 +54,7 @@ void MOS6502_EOR_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_EOR_ABS(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetAbsValue(memory);
-    PerformEOR(cpu, value);
-}
-
-/**
- * @brief Exclusive OR (generic)
- * @addressing Absolute Indexed
- * @param memory Memory struct instance.
- * @param cpu MOS6502 struct instance.
- * @param offsetValue Address offset value.
- */
-FORCE_INLINE void MOS6502_EOR_ABS_Indexed(Memory &memory, MOS6502 &cpu, BYTE offsetValue) {
-    const BYTE value = cpu.GetAbsIndexedValue(memory, offsetValue);
-    PerformEOR(cpu, value);
+    PerformEOR(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -76,7 +64,7 @@ FORCE_INLINE void MOS6502_EOR_ABS_Indexed(Memory &memory, MOS6502 &cpu, BYTE off
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_EOR_ABSX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_EOR_ABS_Indexed(memory, cpu, cpu.X);
+    PerformEOR(memory, cpu, MOS6502_AddressingMode::Absolute_X);
 }
 
 /**
@@ -86,7 +74,7 @@ void MOS6502_EOR_ABSX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_EOR_ABSY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_EOR_ABS_Indexed(memory, cpu, cpu.Y);
+    PerformEOR(memory, cpu, MOS6502_AddressingMode::Absolute_Y);
 }
 
 /**
@@ -96,8 +84,7 @@ void MOS6502_EOR_ABSY(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_EOR_INDX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetIndXAddressValue(memory);
-    PerformEOR(cpu, value);
+    PerformEOR(memory, cpu, MOS6502_AddressingMode::Indirect_X);
 }
 
 /**
@@ -107,6 +94,5 @@ void MOS6502_EOR_INDX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_EOR_INDY(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetIndYAddressValue(memory, false);
-    PerformEOR(cpu, value);
+    PerformEOR(memory, cpu, MOS6502_AddressingMode::Indirect_Y, false);
 }

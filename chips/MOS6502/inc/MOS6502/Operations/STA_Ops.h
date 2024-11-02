@@ -8,7 +8,7 @@
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STA_ZP(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ST_ZP(memory, cpu, cpu.A);
+    PerformSTA(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -18,7 +18,7 @@ void MOS6502_STA_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STA_ZPX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ST_ZP(memory, cpu, cpu.A, cpu.X);
+    PerformSTA(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -28,7 +28,7 @@ void MOS6502_STA_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STA_ABS(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ST_ABS(memory, cpu, cpu.A);
+    PerformSTA(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -38,7 +38,7 @@ void MOS6502_STA_ABS(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STA_ABSX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ST_ABS(memory, cpu, cpu.A, cpu.X);
+    PerformSTA(memory, cpu, MOS6502_AddressingMode::Absolute_X, false);
 }
 
 /**
@@ -48,7 +48,7 @@ void MOS6502_STA_ABSX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STA_ABSY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ST_ABS(memory, cpu, cpu.A, cpu.Y);
+    PerformSTA(memory, cpu, MOS6502_AddressingMode::Absolute_Y, false);
 }
 
 /**
@@ -58,18 +58,17 @@ void MOS6502_STA_ABSY(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STA_INDX(Memory &memory, MOS6502 &cpu) {
-    const WORD targetAddress = cpu.GetIndXAddress(memory);
-    cpu.WriteByte(memory, cpu.A, targetAddress);
+    PerformSTA(memory, cpu, MOS6502_AddressingMode::Indirect_X);
 }
 
 /**
  * @brief Store Accumulator
  * @addressing (Indirect),Y
+ * @todo fix cycles count mismatch
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STA_INDY(Memory &memory, MOS6502 &cpu) {
-    const WORD targetAddress = cpu.GetIndYAddress(memory, false);
-    cpu.WriteByte(memory, cpu.A, targetAddress);
+    PerformSTA(memory, cpu, MOS6502_AddressingMode::Indirect_Y, false);
     cpu.cycles++; // extra cycle required
 }

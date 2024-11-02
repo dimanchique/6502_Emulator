@@ -3,6 +3,7 @@
 #include "core/compilers_macro.h"
 #include "MOS6502_Status.h"
 #include "base/compute.h"
+#include "MOS6502_AddressingMode.h"
 
 #define STOP_OPCODE 0x02 /**< One of unused MOS6502 opcodes used to stop execution of finite programs*/
 #define PAGE_SIZE 0xFF /**< MOS6502 default page size */
@@ -214,54 +215,80 @@ public:
         return value;
     }
 
+    /**
+     * @brief Convert Stack Pointer register to address.
+     * @return Converted address.
+     */
+    [[nodiscard]] FORCE_INLINE WORD StackPointerToAddress() const noexcept {
+        return 0x100 + SP;
+    }
+
 /** @defgroup MOS6502-Addressing MOS6502 Addressing
  *  MOS6502 Addressing Modes
  *  @{
  */
 
     /**
-     * @brief Get Zero Page addressing mode value.
-     * @details FetchByte. Use fetched byte as an effective address to read from.
-     * Read byte using given effective address.
-     * @note Increments cycles count by 2. Increments PC.
-     * @addressing Zero Page
-     * @see FetchByte
-     * @see ReadByte
+     * @brief Get address based on given addressing mode
+     * @note Offset value is calculating automatically if addressing mode is indexed.
      * @param memory Memory struct instance.
-     * @return Zero Page address value.
+     * @param addressing MOS6502 Addressing mode.
+     * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
+     * @return Target address.
      */
-    FORCE_INLINE BYTE GetZeroPageValue(const Memory &memory) {
-        const BYTE effectiveAddress = FetchByte(memory);
-        return ReadByte(memory, effectiveAddress);
+    FORCE_INLINE WORD GetAddressingModeAddress(const Memory &memory, MOS6502_AddressingMode addressing, bool shouldCheckPageCross = true) {
+        BYTE offsetValue = 0;
+        switch (addressing) {
+            case MOS6502_AddressingMode::ZeroPage_X:
+            case MOS6502_AddressingMode::Absolute_X:
+            case MOS6502_AddressingMode::Indirect_X:
+                offsetValue = X;
+                break;
+
+            case MOS6502_AddressingMode::ZeroPage_Y:
+            case MOS6502_AddressingMode::Absolute_Y:
+            case MOS6502_AddressingMode::Indirect_Y:
+                offsetValue = Y;
+
+            default:
+                break;
+        }
+
+        switch (addressing) {
+            case MOS6502_AddressingMode::Immediate:
+                return  PC++;
+            case MOS6502_AddressingMode::ZeroPage:
+                return FetchByte(memory);
+            case MOS6502_AddressingMode::ZeroPage_X:
+            case MOS6502_AddressingMode::ZeroPage_Y:
+                return GetZeroPageIndexedAddress(memory, offsetValue);
+            case MOS6502_AddressingMode::Absolute:
+                return FetchWord(memory);
+            case MOS6502_AddressingMode::Absolute_X:
+            case MOS6502_AddressingMode::Absolute_Y:
+                return GetAbsIndexedAddress(memory, offsetValue, shouldCheckPageCross);
+            case MOS6502_AddressingMode::Indirect_X:
+                return GetIndXAddress(memory);
+            case MOS6502_AddressingMode::Indirect_Y:
+                return GetIndYAddress(memory, shouldCheckPageCross);
+        }
+        throw; // unexpected
     }
 
     /**
-     * @brief Get Absolute addressing mode value.
-     * @note Increments cycles count by 3. Increments PC by 2.
-     * @addressing Absolute
-     * @see FetchWord
-     * @see ReadByte
+     * @brief Get value based on given addressing mode
+     * @note Offset value is calculating automatically if addressing mode is indexed.
      * @param memory Memory struct instance.
-     * @return Absolute address value.
+     * @param addressing MOS6502 Addressing mode.
+     * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
+     * @return Memory value.
      */
-    FORCE_INLINE BYTE GetAbsValue(const Memory &memory) {
-        const WORD baseAddress = FetchWord(memory);
-        return ReadByte(memory, baseAddress);
+    FORCE_INLINE BYTE GetAddressingModeValue(const Memory &memory, MOS6502_AddressingMode addressing, bool shouldCheckPageCross = true) {
+        const WORD address = GetAddressingModeAddress(memory, addressing, shouldCheckPageCross);
+        return ReadByte(memory, address);
     }
 
-    /**
-     * @brief Get Indexed Zero Page addressing mode value (Generic).
-     * @addressing Zero Page,X
-     * Zero Page,Y
-     * @see GetZeroPageIndexedAddress
-     * @param memory Memory struct instance.
-     * @param offsetValue Address offset value.
-     * @return Zero Page Indexed value.
-     */
-    FORCE_INLINE BYTE GetZeroPageIndexedValue(const Memory &memory, const BYTE offsetValue) {
-        const BYTE effectiveAddress = GetZeroPageIndexedAddress(memory, offsetValue);
-        return ReadByte(memory, effectiveAddress);
-    }
+private:
 
     /**
      * @brief Get Indexed ZeroPage addressing mode address (Generic).
@@ -277,21 +304,7 @@ public:
     FORCE_INLINE WORD GetZeroPageIndexedAddress(const Memory &memory, const BYTE offsetValue) {
         const BYTE baseAddress = FetchByte(memory);
         cycles++;
-        return baseAddress + offsetValue;
-    }
-
-    /**
-     * @brief Get Indexed Absolute addressing mode value (Generic).
-     * @addressing Absolute,X
-     * Absolute,Y
-     * @see GetAbsIndexedAddress
-     * @param memory Memory struct instance.
-     * @param offsetValue Address offset value.
-     * @return Absolute Indexed address value.
-     */
-    FORCE_INLINE BYTE GetAbsIndexedValue(const Memory &memory, const BYTE offsetValue, bool shouldCheckPageCross = true) {
-        const WORD effectiveAddress = GetAbsIndexedAddress(memory, offsetValue, shouldCheckPageCross);
-        return ReadByte(memory, effectiveAddress);
+        return (BYTE)(baseAddress + offsetValue);
     }
 
     /**
@@ -318,18 +331,6 @@ public:
     }
 
     /**
-     * @brief Get (Indirect,X) addressing mode value.
-     * @addressing (Indirect,X)
-     * @see GetIndXAddress
-     * @param memory Memory struct instance.
-     * @return (Indirect,X) address value.
-     */
-    FORCE_INLINE BYTE GetIndXAddressValue(const Memory &memory) {
-        const WORD effectiveAddress = GetIndXAddress(memory);
-        return ReadByte(memory, effectiveAddress);
-    }
-
-    /**
      * @brief Get (Indirect,X) addressing mode address.
      * @details Fetch byte. Add X to the fetched value.
      * Read word using this value to get (Indirect,X) address.
@@ -344,18 +345,6 @@ public:
         const BYTE baseAddress = FetchByte(memory) + X;
         cycles++;
         return ReadWord(memory, baseAddress);
-    }
-
-    /**
-     * @brief Get (Indirect),Y addressing mode value.
-     * @addressing (Indirect),Y
-     * @see GetIndYAddress
-     * @param memory Memory struct instance.
-     * @return (Indirect),Y address value.
-     */
-    FORCE_INLINE BYTE GetIndYAddressValue(const Memory &memory, bool shouldCheckPageCross = true) {
-        const WORD effectiveAddress = GetIndYAddress(memory, shouldCheckPageCross);
-        return ReadByte(memory, effectiveAddress);
     }
 
     /**
@@ -381,12 +370,4 @@ public:
     }
 
 /** @} */ // end of addressing
-
-    /**
-     * @brief Convert Stack Pointer register to address.
-     * @return Converted address.
-     */
-    [[nodiscard]] FORCE_INLINE WORD StackPointerToAddress() const noexcept {
-        return 0x100 + SP;
-    }
 };

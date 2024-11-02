@@ -9,7 +9,7 @@
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STX_ZP(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ST_ZP(memory, cpu, cpu.X);
+    PerformSTX(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -20,7 +20,7 @@ void MOS6502_STX_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STX_ZPY(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ST_ZP(memory, cpu, cpu.X, cpu.Y);
+    PerformSTX(memory, cpu, MOS6502_AddressingMode::ZeroPage_Y);
 }
 
 /**
@@ -31,5 +31,5 @@ void MOS6502_STX_ZPY(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_STX_ABS(Memory &memory, MOS6502 &cpu) {
-    MOS6502_ST_ABS(memory, cpu, cpu.X);
+    PerformSTX(memory, cpu, MOS6502_AddressingMode::Absolute);
 }

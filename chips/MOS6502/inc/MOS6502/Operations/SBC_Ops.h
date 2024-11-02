@@ -7,10 +7,13 @@
  * together with the not of the carry bit.
  * If overflow occurs the carry bit is clear, this enables multiple byte subtraction to be performed.
  * @short A,Z,C,N = A-M-(1-C)
+ * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param value Value to subtract.
+ * @param addressing MOS6502 Addressing mode.
  */
-FORCE_INLINE void PerformSBC(MOS6502 &cpu, const BYTE value) {
+FORCE_INLINE void PerformSBC(Memory &memory, MOS6502 &cpu, const MOS6502_AddressingMode addressing) {
+    const BYTE value = cpu.GetAddressingModeValue(memory, addressing);
+
     const bool signBitsMatch = !((cpu.A ^ value) & MOS6502_Status_N);
     const WORD subRes = cpu.A - value - (1 - cpu.Status.C);
     cpu.A = subRes;
@@ -26,8 +29,7 @@ FORCE_INLINE void PerformSBC(MOS6502 &cpu, const BYTE value) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_IM(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.FetchByte(memory);
-    PerformSBC(cpu, value);
+    PerformSBC(memory, cpu, MOS6502_AddressingMode::Immediate);
 }
 
 /**
@@ -37,8 +39,7 @@ void MOS6502_SBC_IM(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance
  */
 void MOS6502_SBC_ZP(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetZeroPageValue(memory);
-    PerformSBC(cpu, value);
+    PerformSBC(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -48,8 +49,7 @@ void MOS6502_SBC_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetZeroPageIndexedValue(memory, cpu.X);
-    PerformSBC(cpu, value);
+    PerformSBC(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -59,8 +59,7 @@ void MOS6502_SBC_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_ABS(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetAbsValue(memory);
-    PerformSBC(cpu, value);
+    PerformSBC(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -70,8 +69,7 @@ void MOS6502_SBC_ABS(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_ABSX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetAbsIndexedValue(memory, cpu.X);
-    PerformSBC(cpu, value);
+    PerformSBC(memory, cpu, MOS6502_AddressingMode::Absolute_X);
 }
 
 /**
@@ -81,8 +79,7 @@ void MOS6502_SBC_ABSX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_ABSY(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetAbsIndexedValue(memory, cpu.Y);
-    PerformSBC(cpu, value);
+    PerformSBC(memory, cpu, MOS6502_AddressingMode::Absolute_Y);
 }
 
 /**
@@ -92,8 +89,7 @@ void MOS6502_SBC_ABSY(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_INDX(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetIndXAddressValue(memory);
-    PerformSBC(cpu, value);
+    PerformSBC(memory, cpu, MOS6502_AddressingMode::Indirect_X);
 }
 
 /**
@@ -103,6 +99,5 @@ void MOS6502_SBC_INDX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_SBC_INDY(Memory &memory, MOS6502 &cpu) {
-    const BYTE value = cpu.GetIndYAddressValue(memory);
-    PerformSBC(cpu, value);
+    PerformSBC(memory, cpu, MOS6502_AddressingMode::Indirect_Y);
 }

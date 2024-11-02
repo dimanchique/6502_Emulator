@@ -8,7 +8,7 @@
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDY_IM(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_IM(memory, cpu, cpu.Y);
+    PerformLDY(memory, cpu, MOS6502_AddressingMode::Immediate);
 }
 
 /**
@@ -18,7 +18,7 @@ void MOS6502_LDY_IM(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDY_ZP(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ZP(memory, cpu, cpu.Y);
+    PerformLDY(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -28,7 +28,7 @@ void MOS6502_LDY_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDY_ZPX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ZP_Indexed(memory, cpu, cpu.Y, cpu.X);
+    PerformLDY(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -38,7 +38,7 @@ void MOS6502_LDY_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDY_ABS(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ABS(memory, cpu, cpu.Y);
+    PerformLDY(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -48,5 +48,5 @@ void MOS6502_LDY_ABS(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_LDY_ABSX(Memory &memory, MOS6502 &cpu) {
-    MOS6502_LD_ABS_Indexed(memory, cpu, cpu.Y, cpu.X);
+    PerformLDY(memory, cpu, MOS6502_AddressingMode::Absolute_X);
 }

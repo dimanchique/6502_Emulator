@@ -7,9 +7,12 @@
  * Bit 7 is filled with the current value of the carry flag whilst the old bit 0 becomes the new carry flag value.
  * @param memory Memory struct instance.
  * @param cpu MOS6502 struct instance.
- * @param address Address to write back shifted value.
+ * @param addressing MOS6502 Addressing mode.
+ * @param shouldCheckPageCross Whether this operation should check page crossing while target address is calculating.
  */
-FORCE_INLINE void PerformROR(Memory &memory, MOS6502 &cpu, const WORD address) {
+FORCE_INLINE void PerformROR(Memory &memory, MOS6502 &cpu, const MOS6502_AddressingMode addressing, bool shouldCheckPageCross = true) {
+    const WORD address = cpu.GetAddressingModeAddress(memory, addressing, shouldCheckPageCross);
+
     BYTE memoryValue = cpu.ReadByte(memory, address);
     const bool carry = memoryValue & 1;
     memoryValue >>= 1;
@@ -42,8 +45,7 @@ void MOS6502_ROR_ACC(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ROR_ZP(Memory &memory, MOS6502 &cpu) {
-    const BYTE address = cpu.FetchByte(memory);
-    PerformROR(memory, cpu, address);
+    PerformROR(memory, cpu, MOS6502_AddressingMode::ZeroPage);
 }
 
 /**
@@ -53,8 +55,7 @@ void MOS6502_ROR_ZP(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ROR_ZPX(Memory &memory, MOS6502 &cpu) {
-    const BYTE address = cpu.GetZeroPageIndexedAddress(memory, cpu.X);
-    PerformROR(memory, cpu, address);
+    PerformROR(memory, cpu, MOS6502_AddressingMode::ZeroPage_X);
 }
 
 /**
@@ -64,8 +65,7 @@ void MOS6502_ROR_ZPX(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ROR_ABS(Memory &memory, MOS6502 &cpu) {
-    const WORD address = cpu.FetchWord(memory);
-    PerformROR(memory, cpu, address);
+    PerformROR(memory, cpu, MOS6502_AddressingMode::Absolute);
 }
 
 /**
@@ -75,6 +75,5 @@ void MOS6502_ROR_ABS(Memory &memory, MOS6502 &cpu) {
  * @param cpu MOS6502 struct instance.
  */
 void MOS6502_ROR_ABSX(Memory &memory, MOS6502 &cpu) {
-    const WORD address = cpu.GetAbsIndexedAddress(memory, cpu.X, false);
-    PerformROR(memory, cpu, address);
+    PerformROR(memory, cpu, MOS6502_AddressingMode::Absolute_X, false);
 }
