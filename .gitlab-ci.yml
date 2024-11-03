@@ -1,4 +1,6 @@
-image: resim_base_image:latest
+image:
+  name: resim_base_image:v2
+  pull_policy: never
 
 stages:
   - build
@@ -6,9 +8,9 @@ stages:
 build:
   stage: build
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
     - mkdir build
-    - cd build && cmake .. -DRESIM_BUILD_TESTING=ON -DCMAKE_BULD_TYPE=Release -GNinja
+    - cd build && cmake .. -DRESIM_BUILD_TESTING=ON -GNinja
     - ninja -C .
     - ctest -V -j 5
