@@ -5,39 +5,39 @@
 enum I8080_OpCodes : BYTE {
 
 //  Add...
-    ADD_A = 0x87,       //  ...Register or Memory To Accumulator
-    ADD_B = 0x80,       //
-    ADD_C = 0x81,       //
-    ADD_D = 0x82,       //
-    ADD_E = 0x83,       //
-    ADD_H = 0x84,       //
-    ADD_L = 0x85,       //
-    ADD_M = 0x86,       //
-    ADI = 0xC6,         //  ...Immediate Data to Accumulator
-    ADC_A = 0x8F,       //  ...Register or Memory to Accumulator with Carry
-    ADC_B = 0x88,       //
-    ADC_C = 0x89,       //
-    ADC_D = 0x8A,       //
-    ADC_E = 0x8B,       //
-    ADC_H = 0x8C,       //
-    ADC_L = 0x8D,       //
-    ADC_M = 0x8E,       //
-    ACI = 0xCE,         //  ...Immediate Data to Accumulator with Carry
-    DAD_B = 0x09,       //  ...16-bit number stored in B and C
-    DAD_D = 0x19,       //  ...16-bit number stored in D and E
-    DAD_H = 0x29,       //  ...16-bit number stored in H and L
-    DAD_SP = 0x39,      //  ...16-bit number stored in SP
+    ADD_A = 0x87,   //  ...Register or Memory To Accumulator
+    ADD_B = 0x80,   //
+    ADD_C = 0x81,   //
+    ADD_D = 0x82,   //
+    ADD_E = 0x83,   //
+    ADD_H = 0x84,   //
+    ADD_L = 0x85,   //
+    ADD_M = 0x86,   //
+    ADI = 0xC6,     //  ...Immediate Data to Accumulator
+    ADC_A = 0x8F,   //  ...Register or Memory to Accumulator with Carry
+    ADC_B = 0x88,   //
+    ADC_C = 0x89,   //
+    ADC_D = 0x8A,   //
+    ADC_E = 0x8B,   //
+    ADC_H = 0x8C,   //
+    ADC_L = 0x8D,   //
+    ADC_M = 0x8E,   //
+    ACI = 0xCE,     //  ...Immediate Data to Accumulator with Carry
+    DAD_B = 0x09,   //  ...16-bit number stored in B and C
+    DAD_D = 0x19,   //  ...16-bit number stored in D and E
+    DAD_H = 0x29,   //  ...16-bit number stored in H and L
+    DAD_SP = 0x39,  //  ...16-bit number stored in SP
 
 //  AND...
-    ANA_A = 0xA7,       //  ...Register or Memory with Accumulator
-    ANA_B = 0xA0,       //
-    ANA_C = 0xA1,       //
-    ANA_D = 0xA2,       //
-    ANA_E = 0xA3,       //
-    ANA_H = 0xA4,       //
-    ANA_L = 0xA5,       //
-    ANA_M = 0xA6,       //
-    ANI = 0xE6,         //  ...Immediate Data with Accumulator
+    ANA_A = 0xA7,   //  ...Register or Memory with Accumulator
+    ANA_B = 0xA0,   //
+    ANA_C = 0xA1,   //
+    ANA_D = 0xA2,   //
+    ANA_E = 0xA3,   //
+    ANA_H = 0xA4,   //
+    ANA_L = 0xA5,   //
+    ANA_M = 0xA6,   //
+    ANI = 0xE6,     //  ...Immediate Data with Accumulator
 
 //  CALL - Call
     CALL = 0xCD,

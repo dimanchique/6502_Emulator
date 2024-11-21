@@ -14,37 +14,38 @@ public:
         cyclesPassed = cpu.Run(mem);
 
         // then:
-        EXPECT_EQ(*targetRegisterPtr, WORD(--value));
+        value -= 1;
+        EXPECT_EQ(*targetRegisterPtr, WORD(value));
         CheckCyclesCount();
     }
 };
 
 TEST_F(I8080_DCXFixture, DCX_B_CanDecrement) {
-    DCX_CanDecrementValue(DCX_B, reinterpret_cast<WORD*>(&cpu.B));
+    DCX_CanDecrementValue(DCX_B, &cpu.BC);
 }
 
 TEST_F(I8080_DCXFixture, DCX_B_CanDecrement_Overflowed) {
-    WORD* registerPtr = reinterpret_cast<WORD*>(&cpu.B);
+    WORD* registerPtr = &cpu.BC;
     *registerPtr = 0x3900;
     DCX_CanDecrementValue(DCX_B, registerPtr);
 }
 
 TEST_F(I8080_DCXFixture, DCX_D_CanDecrement) {
-    DCX_CanDecrementValue(DCX_D, reinterpret_cast<WORD*>(&cpu.D));
+    DCX_CanDecrementValue(DCX_D, &cpu.DE);
 }
 
 TEST_F(I8080_DCXFixture, DCX_D_CanDecrement_Overflowed) {
-    WORD* registerPtr = reinterpret_cast<WORD*>(&cpu.D);
+    WORD* registerPtr = &cpu.DE;
     *registerPtr = 0x3900;
     DCX_CanDecrementValue(DCX_D, registerPtr);
 }
 
 TEST_F(I8080_DCXFixture, DCX_H_CanDecrement) {
-    DCX_CanDecrementValue(DCX_H, reinterpret_cast<WORD*>(&cpu.H));
+    DCX_CanDecrementValue(DCX_H, &cpu.HL);
 }
 
 TEST_F(I8080_DCXFixture, DCX_H_CanDecrement_Overflowed) {
-    WORD* registerPtr = reinterpret_cast<WORD*>(&cpu.H);
+    WORD* registerPtr = &cpu.HL;
     *registerPtr = 0x3900;
     DCX_CanDecrementValue(DCX_H, registerPtr);
 }

@@ -1,23 +1,52 @@
 #pragma once
 #include "I8080/I8080.h"
 
-FORCE_INLINE void GenericDCX(I8080 &cpu, WORD *targetRegisterPtr) {
-    (*targetRegisterPtr)--;
+/**
+ * @brief Decrement Register Pair Implementation
+ * @details The 16-bit number held in the specified register pair is decremented by one.
+ * @short Register = Register-1
+ * @note Condition bits are not affected
+ * @param memory Memory struct instance.
+ * @param cpu I8080 struct instance.
+ * @param targetRegister Register to decrement.
+ */
+FORCE_INLINE void PerformDCX(I8080 &cpu, WORD &targetRegister) {
+    targetRegister = (WORD)(targetRegister + 0xFFFF); // +(-1) is better than -1
     cpu.cycles++;
 }
 
+/**
+ * @brief Decrement BC
+ * @param memory Memory struct instance.
+ * @param cpu I8080 struct instance.
+ */
 void I8080_DCX_B(Memory &memory, I8080 &cpu) {
-    GenericDCX(cpu, reinterpret_cast<WORD*>(&cpu.B));
+    PerformDCX(cpu, cpu.BC);
 }
 
+/**
+ * @brief Decrement DE
+ * @param memory Memory struct instance.
+ * @param cpu I8080 struct instance.
+ */
 void I8080_DCX_D(Memory &memory, I8080 &cpu) {
-    GenericDCX(cpu, reinterpret_cast<WORD*>(&cpu.D));
+    PerformDCX(cpu, cpu.DE);
 }
 
+/**
+ * @brief Decrement HL
+ * @param memory Memory struct instance.
+ * @param cpu I8080 struct instance.
+ */
 void I8080_DCX_H(Memory &memory, I8080 &cpu) {
-    GenericDCX(cpu, reinterpret_cast<WORD*>(&cpu.H));
+    PerformDCX(cpu, cpu.HL);
 }
 
+/**
+ * @brief Decrement SP
+ * @param memory Memory struct instance.
+ * @param cpu I8080 struct instance.
+ */
 void I8080_DCX_SP(Memory &memory, I8080 &cpu) {
-    GenericDCX(cpu, &cpu.SP);
+    PerformDCX(cpu, cpu.SP);
 }

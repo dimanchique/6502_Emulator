@@ -1,17 +1,41 @@
 #pragma once
 #include "I8080/I8080.h"
 
-FORCE_INLINE void GenericMOV_RegToReg(I8080 &cpu, BYTE &destRegister, const BYTE &srcRegister) {
+/**
+ * @brief Move Data from Register to Register Implementation
+ * @details One byte of data is moved from the source register to the register the destination register.
+ * The data replaces the contents of the destination register; the source remains unchanged.
+ * @param cpu I8080 struct instance.
+ * @param destRegister Destination register.
+ * @param srcRegister Source register.
+ */
+FORCE_INLINE void PerformRegToRegMOV(I8080 &cpu, BYTE &destRegister, const BYTE &srcRegister) {
     destRegister = srcRegister;
     cpu.cycles++;
 }
 
-FORCE_INLINE void GenericMOV_MemToReg(Memory &memory, I8080 &cpu, BYTE &destRegister) {
+/**
+ * @brief Move Data from Memory to Register Implementation
+ * @details One byte of data is moved from memory location to the register the destination register.
+ * The data replaces the contents of the destination register; the source remains unchanged.
+ * @param memory Memory struct instance.
+ * @param cpu I8080 struct instance.
+ * @param destRegister Destination register.
+ */
+FORCE_INLINE void PerformMemToRegMOV(Memory &memory, I8080 &cpu, BYTE &destRegister) {
     const WORD memoryAddress = ReSimFunctionLibrary::ContentManipulation::getWordAsSwappedBytes_Copy(cpu.H, cpu.L);
     destRegister = cpu.ReadByte(memory, memoryAddress);
 }
 
-FORCE_INLINE void GenericMOV_RegToMem(Memory &memory, I8080 &cpu, const BYTE &srcRegister) {
+/**
+ * @brief Move Data from Register To Memory Implementation
+ * @details One byte of data is moved from source register to the memory location formed using HL register.
+ * The data replaces the contents of the destination register; the source remains unchanged.
+ * @param memory Memory struct instance.
+ * @param cpu I8080 struct instance.
+ * @param srcRegister Source register.
+ */
+FORCE_INLINE void PerformRegToMemMOV(Memory &memory, I8080 &cpu, const BYTE &srcRegister) {
     const WORD memoryAddress = ReSimFunctionLibrary::ContentManipulation::getWordAsSwappedBytes_Copy(cpu.H, cpu.L);
     cpu.WriteByte(memory, srcRegister, memoryAddress);
 }
