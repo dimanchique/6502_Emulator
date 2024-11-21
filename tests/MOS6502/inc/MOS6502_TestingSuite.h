@@ -23,4 +23,11 @@ public:
     void CheckCyclesCount() const noexcept {
         EXPECT_EQ(cyclesPassed, cyclesExpected);
     }
+
+    void SetStatusBitByMask(BYTE mask, BYTE value) {
+        if (value)
+            cpu.Status = cpu.Status | mask;
+        else
+            cpu.Status = cpu.Status & ~mask;
+    }
 };

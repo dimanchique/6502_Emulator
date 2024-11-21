@@ -48,27 +48,4 @@ struct MOS6502_Status {
         if (mask & MOS6502_Status_N)
             N = (value & MOS6502_Status_N) > 0;
     }
-
-    /**
-     * @brief Get status bit.
-     * @details Get status bit using given mask.
-     * @params mask Status bit mask.
-     * @return bool Status bit value.
-     */
-    FORCE_INLINE bool GetStatusBit(const BYTE mask) const noexcept {
-        return BYTE(*this) & mask;
-    }
-
-    /**
-     * @brief Set status bit.
-     * @details Set status bit using given mask and state.
-     * @params mask Status bit mask.
-     * @params state Status bit state.
-     */
-    FORCE_INLINE void SetStatusBit(const BYTE mask, const bool state) noexcept {
-        if (state)
-            *(BYTE *) (this) |= mask;
-        else
-            *(BYTE *) (this) &= ~mask;
-    }
 };

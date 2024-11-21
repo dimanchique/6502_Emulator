@@ -2,7 +2,7 @@
 
 void MOS6502_BFixture::B_REL_CanBranch(MOS6502_OpCodes opcode, BYTE targetStatusFlag, bool flagValue) {
     // given:
-    cpu.Status.SetStatusBit(targetStatusFlag, flagValue);
+    SetStatusBitByMask(targetStatusFlag, flagValue);
     mem[0xFFFC] = 0x40;
     mem[0xFFFD] = 0x40;
     mem[0x4040] = opcode;
@@ -23,7 +23,7 @@ void MOS6502_BFixture::B_REL_CanBranch(MOS6502_OpCodes opcode, BYTE targetStatus
 
 void MOS6502_BFixture::B_REL_CannotBranch(MOS6502_OpCodes opcode, BYTE targetStatusFlag, bool flagValue) {
     // given:
-    cpu.Status.SetStatusBit(targetStatusFlag, flagValue);
+    SetStatusBitByMask(targetStatusFlag, flagValue);
     mem[0xFFFC] = 0x00;
     mem[0xFFFD] = 0x40;
     mem[0x4000] = opcode;
@@ -44,7 +44,7 @@ void MOS6502_BFixture::B_REL_CanBranch_WithPageCrossing(MOS6502_OpCodes opcode, 
     // given:
     mem[0xFFFC] = 0x00;
     mem[0xFFFD] = 0x40;
-    cpu.Status.SetStatusBit(targetStatusFlag, flagValue);
+    SetStatusBitByMask(targetStatusFlag, flagValue);
     mem[0x4000] = opcode;
     mem[0x4001] = -10;
     mem[0x4001 - 10 + 1] = LDA_IM;

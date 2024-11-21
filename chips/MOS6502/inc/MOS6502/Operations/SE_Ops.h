@@ -8,7 +8,7 @@
  * @param statusFlag Status flag to set.
  */
 FORCE_INLINE void GenericSE(MOS6502 &cpu, const BYTE statusFlag) {
-    cpu.Status.SetStatusBit(statusFlag, true);
+    cpu.Status = cpu.Status | statusFlag;
     cpu.cycles++;
 }
 

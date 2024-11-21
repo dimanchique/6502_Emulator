@@ -5,7 +5,7 @@
 #include "base/compute.h"
 #include "MOS6502_AddressingMode.h"
 
-#define STOP_OPCODE 0x02 /**< One of unused MOS6502 opcodes used to stop execution of finite programs*/
+#define STOP_OPCODE 0x02 /**< One of unused MOS6502 opcodes used to stop execution of finite programs */
 #define PAGE_SIZE 0xFF /**< MOS6502 default page size */
 #define IsPageCrossed(src, dst) ((src ^ dst) >= PAGE_SIZE) /**< Memory page is crossed when it bounds PAGE_SIZE */
 
@@ -13,7 +13,13 @@
  * @class MOS6502
  * @brief MOS6502 CPU implementation
  * @details MOS6502 (Launch: 1975) is an 8-bit microprocessor with 55 supported instructions and 8 addressing modes.
- * Registers: Program Counter register (PC), Stack Pointer register (SP), Accumulator register (A), two index registers (X,Y) and Status.
+ * Registers:
+ * - Program Counter register (PC)
+ * - Stack Pointer register (SP)
+ * - Accumulator register (A)
+ * - X index register (X)
+ * - Y index register (Y)
+ * - Status register
  * Max CPU clock rate 1-3 MHz. Data width: 8 bits. Address width: 16 bits
  */
 class MOS6502 final : public Compute {
@@ -72,7 +78,7 @@ public:
 
     /**
      * @brief Read word from memory.
-     * @note Increments PC by 2. Increments cycles count by 2.
+     * @note Increments cycles count by 2.
      * @attention MOS6502 is little-endian system.
      * 16-bit word value has memory layout [LOW][HIGH].
      * Additional 8-bit shift is needed.
@@ -109,10 +115,8 @@ public:
      * @param address Address to write to.
      */
     FORCE_INLINE void WriteWord(Memory &memory, const WORD value, const WORD address) {
-        memory[address] = value & 0xFF;
-        cycles++;
-        memory[address + 1] = (value >> 8);
-        cycles++;
+        WriteByte(memory, value & 0xFF, address);
+        WriteByte(memory, (value >> 8), address + 1);
     }
 
     /**

@@ -8,7 +8,7 @@
  * @param statusFlag Status flag to clear.
  */
 FORCE_INLINE void PerformCL(MOS6502 &cpu, const BYTE statusFlag) {
-    cpu.Status.SetStatusBit(statusFlag, false);
+    cpu.Status = cpu.Status & ~statusFlag;
     cpu.cycles++;
 }
 

@@ -20,7 +20,7 @@
 #include "MOS6502/Operations/BIT_Ops.h"
 #include "MOS6502/Operations/ROL_Ops.h"
 #include "MOS6502/Operations/ROR_Ops.h"
-#include "MOS6502/Operations/NOP_Op.h"
+#include "MOS6502/Operations/NOP_Ops.h"
 #include "MOS6502/Operations/B_Ops.h"
 #include "MOS6502/Operations/CMP_Ops.h"
 #include "MOS6502/Operations/CPX_Ops.h"

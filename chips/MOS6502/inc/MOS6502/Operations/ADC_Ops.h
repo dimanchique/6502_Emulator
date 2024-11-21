@@ -17,8 +17,8 @@ FORCE_INLINE void PerformADC(Memory &memory, MOS6502 &cpu, const MOS6502_Address
     const WORD addRes = cpu.A + value + cpu.Status.C;
     cpu.A = addRes;
     cpu.Status.UpdateStatusByValue(cpu.A, MOS6502_Status_Z | MOS6502_Status_N);
-    cpu.Status.SetStatusBit(MOS6502_Status_C, addRes > 0xFF);
-    cpu.Status.SetStatusBit(MOS6502_Status_V, signBitsMatch && ((cpu.A ^ value) & MOS6502_Status_N));
+    cpu.Status.C = addRes > 0xFF;
+    cpu.Status.V = signBitsMatch && ((cpu.A ^ value) & MOS6502_Status_N);
 }
 
 /**

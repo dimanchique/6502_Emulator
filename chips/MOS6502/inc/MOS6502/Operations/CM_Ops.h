@@ -15,7 +15,7 @@ FORCE_INLINE void PerformCM(Memory &memory, MOS6502 &cpu, const BYTE &targetRegi
 
     const BYTE compareResult = targetRegister - memoryValue;
     cpu.Status.UpdateStatusByValue(compareResult, MOS6502_Status_Z | MOS6502_Status_N);
-    cpu.Status.SetStatusBit(MOS6502_Status_C, targetRegister >= memoryValue);
+    cpu.Status.C = targetRegister >= memoryValue;
 }
 
 /**

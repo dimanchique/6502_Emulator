@@ -18,8 +18,8 @@ FORCE_INLINE void PerformSBC(Memory &memory, MOS6502 &cpu, const MOS6502_Address
     const WORD subRes = cpu.A - value - (1 - cpu.Status.C);
     cpu.A = subRes;
     cpu.Status.UpdateStatusByValue(cpu.A, MOS6502_Status_Z | MOS6502_Status_N);
-    cpu.Status.SetStatusBit(MOS6502_Status_C, subRes > 0xFF);
-    cpu.Status.SetStatusBit(MOS6502_Status_V, signBitsMatch && ((cpu.A ^ value) & MOS6502_Status_N));
+    cpu.Status.C = subRes > 0xFF;
+    cpu.Status.V = signBitsMatch && ((cpu.A ^ value) & MOS6502_Status_N);
 }
 
 /**
