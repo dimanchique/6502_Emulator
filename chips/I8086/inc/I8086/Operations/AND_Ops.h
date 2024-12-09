@@ -22,7 +22,7 @@ void UpdateStatusAfterAND_Wrapper(I8086 &cpu, const InstructionResult<T> &instru
 
 template<typename T>
 void I8086_EGx_EGx_AND(Memory &memory, I8086 &cpu, InstructionDirection direction) {
-    I8086_EGx_EGx<BYTE>(memory, cpu, &PerformAND, &UpdateStatusAfterAND_Wrapper, direction);
+    I8086_EGx_EGx<T>(memory, cpu, &PerformAND, &UpdateStatusAfterAND_Wrapper, direction);
 }
 
 //  Mem8 <-- Mem8 AND Reg8

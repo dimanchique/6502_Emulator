@@ -22,7 +22,7 @@ void UpdateStatusAfterXOR_Wrapper(I8086 &cpu, const InstructionResult<T> &instru
 
 template<typename T>
 void I8086_EGx_EGx_XOR(Memory &memory, I8086 &cpu, InstructionDirection direction) {
-    I8086_EGx_EGx<BYTE>(memory, cpu, &PerformXOR, &UpdateStatusAfterXOR_Wrapper, direction);
+    I8086_EGx_EGx<T>(memory, cpu, &PerformXOR, &UpdateStatusAfterXOR_Wrapper, direction);
 }
 
 //  Mem8 <-- Mem8 XOR Reg8
