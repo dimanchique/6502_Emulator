@@ -45,6 +45,57 @@ public:
     }
 
     template<typename T>
+    void OR_CanDo_OR_Gx_Ex(const T* leftRegPtr, const T* rightRegPtr, ModRegByteConstructor &modReg) {
+        // given:
+        WORD initialLeftReg = *leftRegPtr;
+        WORD initialRightReg = *rightRegPtr;
+
+        cpu.PC = 0x1000;
+        cpu.CS = 0x1000;
+        DWORD effectiveAddress = cpu.PC + (cpu.CS << 4);
+
+        modReg.size = std::is_same_v<T, BYTE> ? OperandSize::BYTE : OperandSize::WORD;;
+        BYTE modRegByte = modReg.MakeModByte();
+
+        mem[effectiveAddress++] = std::is_same_v<T, BYTE> ? OR_Gb_Eb : OR_Gv_Ev;
+        mem[effectiveAddress++] = modRegByte;
+
+        mem[effectiveAddress++] = STOP_OPCODE;
+
+        // when:
+        cyclesPassed = cpu.Run(mem);
+
+        // then:
+        // Temporary disabled until cycles counter will be fixed
+        // CheckCyclesCount();
+
+        // Result of GxEx is always in register
+        EXPECT_EQ(*leftRegPtr, initialLeftReg | initialRightReg);
+    }
+
+    void OR_CanDo_OR_Gv_Ev(const WORD* leftRegPtr, WordRegisters leftRegName, const WORD* rightRegPtr, WordRegisters rightRegName) {
+        ModRegByteConstructor modReg;
+        modReg.leftOp.archetype = OperandArchetype::Reg;
+        modReg.leftOp.regData.wordReg = leftRegName;
+
+        modReg.rightOp.archetype = OperandArchetype::Reg;
+        modReg.rightOp.regData.wordReg = rightRegName;
+
+        OR_CanDo_OR_Gx_Ex(leftRegPtr, rightRegPtr, modReg);
+    }
+
+    void OR_CanDo_OR_Gb_Eb(const BYTE* leftRegPtr, ByteRegisters leftRegName, const BYTE* rightRegPtr, ByteRegisters rightRegName) {
+        ModRegByteConstructor modReg;
+        modReg.leftOp.archetype = OperandArchetype::Reg;
+        modReg.leftOp.regData.byteReg = leftRegName;
+
+        modReg.rightOp.archetype = OperandArchetype::Reg;
+        modReg.rightOp.regData.byteReg = rightRegName;
+
+        OR_CanDo_OR_Gx_Ex(leftRegPtr, rightRegPtr, modReg);
+    }
+
+    template<typename T>
     void OR_CanDo_OR_AI(T initialValue, T memValue) {
         // given:
         cpu.PC = 0x1000;
@@ -75,7 +126,8 @@ public:
     }
 };
 
-TEST_F(I8086_ORFixture, OR_Ev_Gv_FromBX_Addressed_to_AX) {
+// Mem (BX addressed) <-- AX | Mem (BX addressed)
+TEST_F(I8086_ORFixture, OR_Ev_Gv_BX_Addressed_AX) {
     ModRegByteConstructor modReg;
 
     modReg.leftOp.archetype = OperandArchetype::Mem;
@@ -96,7 +148,8 @@ TEST_F(I8086_ORFixture, OR_Ev_Gv_FromBX_Addressed_to_AX) {
     OR_CanDo_OR_Ev_Gv(memAddress, memValue, cpu.AX, modReg);
 }
 
-TEST_F(I8086_ORFixture, OR_Ev_Gv_FromDirectAddressed_to_BX) {
+// Mem (Direct addressed) <-- BX | Mem (Direct addressed)
+TEST_F(I8086_ORFixture, OR_Ev_Gv_Direct_Addressed_BX) {
     ModRegByteConstructor modReg;
 
     modReg.leftOp.archetype = OperandArchetype::Mem;
@@ -115,7 +168,8 @@ TEST_F(I8086_ORFixture, OR_Ev_Gv_FromDirectAddressed_to_BX) {
     OR_CanDo_OR_Ev_Gv(memAddress, memValue, cpu.BX, modReg);
 }
 
-TEST_F(I8086_ORFixture, OR_Ev_Gv_FromBP_Addressed_to_DX_WithDisp) {
+// Mem (BP addressed WithDisp) <-- DX | Mem (BP addressed WithDisp)
+TEST_F(I8086_ORFixture, OR_Ev_Gv_BP_Addressed_WithDisp_DX) {
     ModRegByteConstructor modReg;
 
     modReg.leftOp.archetype = OperandArchetype::Mem;
@@ -136,7 +190,8 @@ TEST_F(I8086_ORFixture, OR_Ev_Gv_FromBP_Addressed_to_DX_WithDisp) {
     OR_CanDo_OR_Ev_Gv(memAddress, memValue, cpu.DX, modReg);
 }
 
-TEST_F(I8086_ORFixture, OR_Ev_Gv_FromBXSI_Addressed_to_AX_WithDisp) {
+// Mem (BX SI addressed WithDisp) <-- AX | Mem (BX SI addressed WithDisp)
+TEST_F(I8086_ORFixture, OR_Ev_Gv_BXSI_Addressed_WithDisp_AX) {
     ModRegByteConstructor modReg;
 
     modReg.leftOp.archetype = OperandArchetype::Mem;
@@ -157,6 +212,38 @@ TEST_F(I8086_ORFixture, OR_Ev_Gv_FromBXSI_Addressed_to_AX_WithDisp) {
     const DWORD memAddress = cpu.BX + cpu.SI + modReg.leftOp.memData.dispValue + (cpu.DS << 4);
     
     OR_CanDo_OR_Ev_Gv(memAddress, memValue, cpu.AX, modReg);
+}
+
+// AX <-- AX | BX
+TEST_F(I8086_ORFixture, OR_Gv_Ev_AX_BX) {
+    cpu.AX = 0x0060;
+    cpu.BX = 0x009A;
+
+    OR_CanDo_OR_Gv_Ev(&cpu.AX, wAX, &cpu.BX, wBX);
+}
+
+// BX <-- BX | DI
+TEST_F(I8086_ORFixture, OR_Gv_Ev_BX_DI) {
+    cpu.BX = 0x0060;
+    cpu.DI = 0x009A;
+
+    OR_CanDo_OR_Gv_Ev(&cpu.BX, wBX, &cpu.DI, wDI);
+}
+
+// AL <-- AL | BH
+TEST_F(I8086_ORFixture, OR_Gb_Eb_AL_BH) {
+    cpu.AL = 0x60;
+    cpu.BH = 0x9A;
+
+    OR_CanDo_OR_Gb_Eb(&cpu.AL, bAL, &cpu.BH, bBH);
+}
+
+// BL <-- BL | CL
+TEST_F(I8086_ORFixture, OR_Gb_Eb_BL_CL) {
+    cpu.BL = 0x0060;
+    cpu.CL = 0x009A;
+
+    OR_CanDo_OR_Gb_Eb(&cpu.BL, bBL,&cpu.CL, bCL);
 }
 
 TEST_F(I8086_ORFixture, OR_AL_Ib_Test1) {
