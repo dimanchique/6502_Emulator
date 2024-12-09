@@ -215,11 +215,11 @@
 - [ ] CMC
 - [ ] GRP3a_Eb
 - [ ] GRP3b_Ev
-- [ ] CLC
-- [ ] STC
-- [ ] CLI
-- [ ] STI
-- [ ] CLD
-- [ ] STD
+- [x] CLC
+- [x] STC
+- [x] CLI
+- [x] STI
+- [x] CLD
+- [x] STD
 - [ ] GRP4_Eb
 - [ ] GRP5_E

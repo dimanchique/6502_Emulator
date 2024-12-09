@@ -15,40 +15,38 @@
 #define I8086_Status_O          (1 << 11)
 
 struct I8086_Status {
-    WORD C      : 1;             // Carry Flag
-    WORD        : 1;             // Not Used
-    WORD P      : 1;             // Parity Flag
-    WORD        : 1;             // Not Used
-    WORD A      : 1;             // Auxiliary Carry Flag
-    WORD        : 1;             // Not Used
-    WORD Z      : 1;             // Zero Flag
-    WORD S      : 1;             // Sign Flag
-    WORD T      : 1;             // Trap Flag
-    WORD I      : 1;             // Interrupt Flag
-    WORD D      : 1;             // Direction Flag
-    WORD O      : 1;             // Overflow Flag
-    WORD        : 4;             // Not Used
+    union {
+        struct {
 
-    operator WORD() noexcept {
-        return *(WORD *) (this);
-    }
-
-    operator WORD() const noexcept {
-        return *(WORD *) (this);
-    }
+            WORD C      : 1;             // Carry Flag
+            WORD        : 1;             // Not Used
+            WORD P      : 1;             // Parity Flag
+            WORD        : 1;             // Not Used
+            WORD A      : 1;             // Auxiliary Carry Flag
+            WORD        : 1;             // Not Used
+            WORD Z      : 1;             // Zero Flag
+            WORD S      : 1;             // Sign Flag
+            WORD T      : 1;             // Trap Flag
+            WORD I      : 1;             // Interrupt Flag
+            WORD D      : 1;             // Direction Flag
+            WORD O      : 1;             // Overflow Flag
+            WORD        : 4;             // Not Used
+        };
+        WORD Value;
+    };
 
     FORCE_INLINE I8086_Status &operator=(const WORD referenceByte) {
         *(WORD *) (this) = referenceByte;
         return *this;
     }
 
-    template<typename T>
-    FORCE_INLINE void UpdateStatusByValue(const T &checkValue, const WORD mask) {
-        if (mask & I8086_Status_Z)
+    template<typename OperandType>
+    FORCE_INLINE void UpdateStatusByValue(const OperandType &checkValue, const WORD mask) {
+        if (mask & I8086_Status_Z) {
             Z = (checkValue == 0);
-        if (mask & I8086_Status_S)
-        {
-            const BYTE bitCheck = std::is_same_v<T, BYTE> ? 7 : 15; // sign check BYTE or WORD
+        }
+        if (mask & I8086_Status_S) {
+            const BYTE bitCheck = std::is_same_v<OperandType, BYTE> ? 7 : 15; // sign check BYTE or WORD
             S = (checkValue & bitCheck) > 0;
         }
         if (mask & I8086_Status_P) {
