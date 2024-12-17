@@ -4,10 +4,6 @@ class I8086_ST_CL_Fixture : public I8086_TestFixture {
 public:
     void ST_CL_Test(I8086_OpCodes opCode) {
         // given:
-        cpu.PC = 0x1000;
-        cpu.CS = 0x1000;
-        DWORD effectiveAddress = cpu.PC + (cpu.CS << 4);
-
         mem[effectiveAddress++] = opCode;
         mem[effectiveAddress] = STOP_OPCODE;
 

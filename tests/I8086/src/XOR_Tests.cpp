@@ -1,14 +1,10 @@
 #include "I8086_TestingSuite.h"
 
-class I8086_XORFixture : public I8086_TestFixture {
+class I8086_XOR_Fixture : public I8086_TestFixture {
 public:
 
     void XOR_CanDo_XOR_Ev_Gv(DWORD memAddress, WORD memValue, WORD refReg, ModRegByteConstructor &modReg) {
         // given:
-        cpu.PC = 0x1000;
-        cpu.CS = 0x1000;
-        DWORD effectiveAddress = cpu.PC + (cpu.CS << 4);
-
         mem[memAddress] = memValue & 0xFF;
         mem[memAddress + 1] = (memValue >> 8) & 0xFF;
 
@@ -49,10 +45,6 @@ public:
         // given:
         WORD initialLeftReg = *leftRegPtr;
         WORD initialRightReg = *rightRegPtr;
-
-        cpu.PC = 0x1000;
-        cpu.CS = 0x1000;
-        DWORD effectiveAddress = cpu.PC + (cpu.CS << 4);
 
         modReg.size = std::is_same_v<T, BYTE> ? OperandSize::BYTE : OperandSize::WORD;;
         BYTE modRegByte = modReg.MakeModByte();
@@ -98,10 +90,6 @@ public:
     template<typename T>
     void XOR_CanDo_XOR_AI(T initialValue, T memValue) {
         // given:
-        cpu.PC = 0x1000;
-        cpu.CS = 0x1000;
-        DWORD effectiveAddress = cpu.PC + (cpu.CS << 4);
-
         if (std::is_same_v<T, BYTE>)
             cpu.AL = initialValue;
         else
@@ -127,7 +115,7 @@ public:
 };
 
 // Mem (BX addressed) <-- AX ^ Mem (BX addressed)
-TEST_F(I8086_XORFixture, XOR_Ev_Gv_BX_Addressed_AX) {
+TEST_F(I8086_XOR_Fixture, XOR_Ev_Gv_BX_Addressed_AX) {
     ModRegByteConstructor modReg;
 
     modReg.leftOp.archetype = OperandArchetype::Mem;
@@ -149,7 +137,7 @@ TEST_F(I8086_XORFixture, XOR_Ev_Gv_BX_Addressed_AX) {
 }
 
 // Mem (Direct addressed) <-- BX ^ Mem (Direct addressed)
-TEST_F(I8086_XORFixture, XOR_Ev_Gv_Direct_Addressed_BX) {
+TEST_F(I8086_XOR_Fixture, XOR_Ev_Gv_Direct_Addressed_BX) {
     ModRegByteConstructor modReg;
 
     modReg.leftOp.archetype = OperandArchetype::Mem;
@@ -169,7 +157,7 @@ TEST_F(I8086_XORFixture, XOR_Ev_Gv_Direct_Addressed_BX) {
 }
 
 // Mem (BP addressed WithDisp) <-- DX ^ Mem (BP addressed WithDisp)
-TEST_F(I8086_XORFixture, XOR_Ev_Gv_BP_Addressed_WithDisp_DX) {
+TEST_F(I8086_XOR_Fixture, XOR_Ev_Gv_BP_Addressed_WithDisp_DX) {
     ModRegByteConstructor modReg;
 
     modReg.leftOp.archetype = OperandArchetype::Mem;
@@ -191,7 +179,7 @@ TEST_F(I8086_XORFixture, XOR_Ev_Gv_BP_Addressed_WithDisp_DX) {
 }
 
 // Mem (BX SI addressed WithDisp) <-- AX ^ Mem (BX SI addressed WithDisp)
-TEST_F(I8086_XORFixture, XOR_Ev_Gv_BXSI_Addressed_WithDisp_AX) {
+TEST_F(I8086_XOR_Fixture, XOR_Ev_Gv_BXSI_Addressed_WithDisp_AX) {
     ModRegByteConstructor modReg;
 
     modReg.leftOp.archetype = OperandArchetype::Mem;
@@ -215,7 +203,7 @@ TEST_F(I8086_XORFixture, XOR_Ev_Gv_BXSI_Addressed_WithDisp_AX) {
 }
 
 // AX <-- AX ^ BX
-TEST_F(I8086_XORFixture, XOR_Gv_Ev_AX_BX) {
+TEST_F(I8086_XOR_Fixture, XOR_Gv_Ev_AX_BX) {
     cpu.AX = 0x0060;
     cpu.BX = 0x009A;
 
@@ -223,7 +211,7 @@ TEST_F(I8086_XORFixture, XOR_Gv_Ev_AX_BX) {
 }
 
 // BX <-- BX ^ DI
-TEST_F(I8086_XORFixture, XOR_Gv_Ev_BX_DI) {
+TEST_F(I8086_XOR_Fixture, XOR_Gv_Ev_BX_DI) {
     cpu.BX = 0x0060;
     cpu.DI = 0x009A;
 
@@ -231,7 +219,7 @@ TEST_F(I8086_XORFixture, XOR_Gv_Ev_BX_DI) {
 }
 
 // AL <-- AL ^ BH
-TEST_F(I8086_XORFixture, XOR_Gb_Eb_AL_BH) {
+TEST_F(I8086_XOR_Fixture, XOR_Gb_Eb_AL_BH) {
     cpu.AL = 0x60;
     cpu.BH = 0x9A;
 
@@ -239,49 +227,49 @@ TEST_F(I8086_XORFixture, XOR_Gb_Eb_AL_BH) {
 }
 
 // BL <-- BL ^ CL
-TEST_F(I8086_XORFixture, XOR_Gb_Eb_BL_CL) {
+TEST_F(I8086_XOR_Fixture, XOR_Gb_Eb_BL_CL) {
     cpu.BL = 0x0060;
     cpu.CL = 0x009A;
 
     XOR_CanDo_XOR_Gb_Eb(&cpu.BL, bBL,&cpu.CL, bCL);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Ib_Test1) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Ib_Test1) {
     XOR_CanDo_XOR_AI<BYTE>(0x11, 0x22);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Ib_Test2) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Ib_Test2) {
     XOR_CanDo_XOR_AI<BYTE>(0x10, 0x01);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Ib_Test3) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Ib_Test3) {
     XOR_CanDo_XOR_AI<BYTE>(0x00, 0x00);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Ib_Test4) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Ib_Test4) {
     XOR_CanDo_XOR_AI<BYTE>(0xFF, 0xFF);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Ib_Test5) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Ib_Test5) {
     XOR_CanDo_XOR_AI<BYTE>(0xFF, 0x00);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Iv_Test1) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Iv_Test1) {
     XOR_CanDo_XOR_AI<WORD>(0x1111, 0x2222);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Iv_Test2) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Iv_Test2) {
     XOR_CanDo_XOR_AI<WORD>(0x1010, 0x0101);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Iv_Test3) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Iv_Test3) {
     XOR_CanDo_XOR_AI<WORD>(0x0000, 0x0000);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Iv_Test4) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Iv_Test4) {
     XOR_CanDo_XOR_AI<WORD>(0xFFFF, 0xFFFF);
 }
 
-TEST_F(I8086_XORFixture, XOR_AL_Iv_Test5) {
+TEST_F(I8086_XOR_Fixture, XOR_AL_Iv_Test5) {
     XOR_CanDo_XOR_AI<WORD>(0xFFFF, 0x0000);
 }

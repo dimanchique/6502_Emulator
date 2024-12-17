@@ -13,9 +13,13 @@ public:
 
     U32 cyclesPassed;
     U32 cyclesExpected;
+    DWORD effectiveAddress;
 
     void SetUp() override {
         cpu.Reset(mem);
+        cpu.PC = 0x1000;
+        cpu.CS = 0x1000;
+        effectiveAddress = cpu.PC + (cpu.CS << 4);
     }
 
     void TearDown() override {
