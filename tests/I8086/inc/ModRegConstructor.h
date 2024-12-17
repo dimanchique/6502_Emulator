@@ -52,6 +52,7 @@ struct ModRegByteConstructor {
 
     OperandConstructor leftOp;
     OperandConstructor rightOp;
+    //TODO: Add 'singleOp' field for single operand instructions
 
     BYTE MakeModByte() {
         ModRegByte modByte{};
