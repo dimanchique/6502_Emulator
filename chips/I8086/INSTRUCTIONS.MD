@@ -111,8 +111,6 @@
 - [ ] JG_Jb
 - [x] GRP1_Eb_Ib
 - [x] GRP1_Ev_Iv
-- [ ] GRP1_Eb_Ib
-- [ ] GRP1_Ev_Ib
 - [ ] TEST_Gb_Eb
 - [ ] TEST_Gv_Ev
 - [ ] XCHG_Gb_Eb
@@ -185,10 +183,10 @@
 - [ ] INT_Ib
 - [ ] INTO
 - [ ] IRET
-- [ ] GRP2_Eb_1
-- [ ] GRP2_Ev_1
-- [ ] GRP2_Eb_CL
-- [ ] GRP2_Ev_CL
+- [x] GRP2_Eb_1
+- [x] GRP2_Ev_1
+- [x] GRP2_Eb_CL
+- [x] GRP2_Ev_CL
 - [ ] AAM_I0
 - [ ] AAD_I0
 - [ ] XLAT
