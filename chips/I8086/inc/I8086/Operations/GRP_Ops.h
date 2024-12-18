@@ -6,6 +6,7 @@
 #include "XOR_Ops.h"
 #include "ROR_RCR_SAR_SHR_Ops.h"
 #include "ROL_RCL_SAL_SHL_Ops.h"
+#include "NOT_NEG_Ops.h"
 
 template<typename T>
 using GRP_CallbackSignature = void (*)(I8086&, Memory&, const ModRegByte&);
@@ -111,4 +112,31 @@ void I8086_GRP2_Eb_CL(BYTE OpCode, Memory &memory, I8086 &cpu) {
 
 void I8086_GRP2_Ev_CL(BYTE OpCode, Memory &memory, I8086 &cpu) {
     I8086_GRP2_Ex_CL<WORD>(memory, cpu);
+}
+
+template<typename T>
+FORCE_INLINE void I8086_GRP3x_Ex(Memory &memory, I8086 &cpu) {
+    const BYTE modByte = cpu.Fetch<BYTE>(memory);
+    const ModRegByte modReg = ModRegByte::FromByte(modByte);
+
+    static constexpr GRP_CallbackSignature<T> callMap[] = {
+            &GRP_InvalidCall<T>,            // 000 -> TEST
+            &GRP_InvalidCall<T>,            // 001 -> INVALID
+            &I8086_NOT<T>,                  // 010 -> NOT
+            &I8086_NEG<T>,                  // 011 -> NEG
+            &GRP_InvalidCall<T>,            // 100 -> MUL
+            &GRP_InvalidCall<T>,            // 101 -> IMUL
+            &GRP_InvalidCall<T>,            // 110 -> DIV
+            &GRP_InvalidCall<T>             // 111 -> IDIV
+    };
+
+    callMap[modReg.reg](cpu, memory, modReg);
+}
+
+void I8086_GRP3a_Eb(BYTE OpCode, Memory &memory, I8086 &cpu) {
+    I8086_GRP3x_Ex<BYTE>(memory, cpu);
+}
+
+void I8086_GRP3b_Ev(BYTE OpCode, Memory &memory, I8086 &cpu) {
+    I8086_GRP3x_Ex<WORD>(memory, cpu);
 }

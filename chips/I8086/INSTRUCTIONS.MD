@@ -211,8 +211,8 @@
 - [ ] REPZ
 - [ ] HLT
 - [ ] CMC
-- [ ] GRP3a_Eb
-- [ ] GRP3b_Ev
+- [x] GRP3a_Eb
+- [x] GRP3b_Ev
 - [x] CLC
 - [x] STC
 - [x] CLI
