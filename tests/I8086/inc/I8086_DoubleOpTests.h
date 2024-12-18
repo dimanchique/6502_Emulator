@@ -1,24 +1,20 @@
 #pragma once
 #include "I8086_TestingSuite.h"
 
-class I8086_RotateFixture : public I8086_TestFixture {
+class I8086_DoubleOpFixture : public I8086_TestFixture {
 public:
 
     template<typename T>
-    void RotateMemory(DWORD memAddress, T memValue, T refValue, I8086_OpCodes opCode, ModRegByteConstructor &modRegConstructor, BYTE regOverride) {
+    void TestMemRegInstruction(DWORD memAddress, T memValue, T refValue, I8086_OpCodes opCode, ModRegByteConstructor &modRegConstructor, WORD executeCyclesExpected) {
         // given:
         mem[memAddress] = memValue & 0xFF;
         if (std::is_same_v<T, WORD>)
             mem[memAddress + 1] = (memValue >> 8) & 0xFF;
 
         modRegConstructor.size = std::is_same_v<T, WORD> ? OperandSize::WORD : OperandSize::BYTE;
-        BYTE modRegByte = modRegConstructor.MakeModByte();
-        ModRegByte modRegModified = ModRegByte::FromByte(modRegByte);
-        modRegModified.reg = regOverride;
-        modRegByte = modRegModified.value;
 
         mem[effectiveAddress++] = opCode;
-        mem[effectiveAddress++] = modRegByte;
+        mem[effectiveAddress++] = modRegConstructor.MakeModByte();
 
         if (modRegConstructor.leftOp.memData.mode == modeDirect) {
             mem[effectiveAddress++] = memAddress & 0xFF;
@@ -32,6 +28,7 @@ public:
         }
 
         mem[effectiveAddress++] = STOP_OPCODE;
+        cyclesExpected = executeCyclesExpected;
 
         // when:
         cyclesPassed = cpu.Run(mem);
@@ -48,33 +45,32 @@ public:
     }
 
     template<typename T>
-    void RotateReg(T* regValue, T refValue, I8086_OpCodes opCode, const BYTE* reg, BYTE regOverride, WORD executeCyclesExpected) {
+    void TestRegRegInstruction(T* leftRegPtr, T* rightRegPtr, T refValue, const BYTE *leftReg, const BYTE *rightReg, I8086_OpCodes opCode, WORD executeCyclesExpected) {
         // given:
+        T initialLeftReg = *leftRegPtr;
+        T initialRightReg = *rightRegPtr;
+
         ModRegByteConstructor modReg;
 
-        modReg.leftOp.archetype = OperandArchetype::Reg;
-        if (std::is_same_v<T, WORD>) {
+        if (std::is_same_v<T, WORD>)
             modReg.size = OperandSize::WORD;
-            modReg.leftOp.regData.wordReg = (WordRegisters)(*reg);
-        }
-        else {
+        else
             modReg.size = OperandSize::BYTE;
-            modReg.leftOp.regData.byteReg = (ByteRegisters)(*reg);
-        }
-        BYTE modRegByte = modReg.MakeModByte();
 
-        ModRegByte modRegModified = ModRegByte::FromByte(modRegByte);
-        modRegModified.reg = regOverride;
-        modRegByte = modRegModified.value;
+        modReg.leftOp.archetype = OperandArchetype::Reg;
+        if (std::is_same_v<T, WORD>)
+            modReg.leftOp.regData.wordReg = (WordRegisters)(*leftReg);
+        else
+            modReg.leftOp.regData.byteReg = (ByteRegisters)(*leftReg);
+
+        modReg.rightOp.archetype = OperandArchetype::Reg;
+        if (std::is_same_v<T, WORD>)
+            modReg.rightOp.regData.wordReg = (WordRegisters)(*rightReg);
+        else
+            modReg.rightOp.regData.byteReg = (ByteRegisters)(*rightReg);
 
         mem[effectiveAddress++] = opCode;
-        mem[effectiveAddress++] = modRegByte;
-
-        if (modReg.leftOp.memData.dispSize > 0) {
-            mem[effectiveAddress++] = modReg.leftOp.memData.dispValue & 0xFF;
-            if (modReg.leftOp.memData.dispSize > 1)
-                mem[effectiveAddress++] = (modReg.leftOp.memData.dispValue >> 8) & 0xFF;
-        }
+        mem[effectiveAddress++] = modReg.MakeModByte();
 
         mem[effectiveAddress++] = STOP_OPCODE;
         cyclesExpected = executeCyclesExpected;
@@ -86,7 +82,7 @@ public:
         // Temporary disabled until cycles counter will be fixed
         // CheckCyclesCount();
 
-        // Result of ExGx is always in memory
-        EXPECT_EQ((T)(*regValue), (T)(refValue));
+        // Result of GxEx is always in register
+        EXPECT_EQ(*leftRegPtr, refValue);
     }
 };

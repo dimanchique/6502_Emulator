@@ -1,118 +1,8 @@
-#include "I8086_TestingSuite.h"
+#include "I8086_DoubleOpTests.h"
+#include "I8086_SingleOpTests.h"
 
-class I8086_AND_Fixture : public I8086_TestFixture {
-public:
-
-    void AND_CanDo_AND_Ev_Gv(DWORD memAddress, WORD memValue, WORD refReg, ModRegByteConstructor &modReg) {
-        // given:
-        mem[memAddress] = memValue & 0xFF;
-        mem[memAddress + 1] = (memValue >> 8) & 0xFF;
-
-        modReg.size = OperandSize::WORD;
-        BYTE modRegByte = modReg.MakeModByte();
-
-        mem[effectiveAddress++] = AND_Ev_Gv;
-        mem[effectiveAddress++] = modRegByte;
-
-        if (modReg.leftOp.memData.mode == modeDirect) {
-            mem[effectiveAddress++] = memAddress & 0xFF;
-            mem[effectiveAddress++] = (memAddress >> 8) & 0xFF;
-        }
-
-        if (modReg.leftOp.memData.dispSize > 0) {
-            mem[effectiveAddress++] = modReg.leftOp.memData.dispValue & 0xFF;
-            if (modReg.leftOp.memData.dispSize > 1)
-                mem[effectiveAddress++] = (modReg.leftOp.memData.dispValue >> 8) & 0xFF;
-        }
-
-        mem[effectiveAddress++] = STOP_OPCODE;
-
-        // when:
-        cyclesPassed = cpu.Run(mem);
-
-        // then:
-        // Temporary disabled until cycles counter will be fixed
-        // CheckCyclesCount();
-
-        // Result of ExGx is always in memory
-        WORD result = mem[memAddress];
-        result |= (mem[memAddress + 1] << 8);
-        EXPECT_EQ(result, refReg & memValue);
-    }
-
-    template<typename T>
-    void AND_CanDo_AND_Gx_Ex(const T* leftRegPtr, const T* rightRegPtr, ModRegByteConstructor &modReg) {
-        // given:
-        WORD initialLeftReg = *leftRegPtr;
-        WORD initialRightReg = *rightRegPtr;
-
-        modReg.size = std::is_same_v<T, BYTE> ? OperandSize::BYTE : OperandSize::WORD;;
-        BYTE modRegByte = modReg.MakeModByte();
-
-        mem[effectiveAddress++] = std::is_same_v<T, BYTE> ? AND_Gb_Eb : AND_Gv_Ev;
-        mem[effectiveAddress++] = modRegByte;
-
-        mem[effectiveAddress++] = STOP_OPCODE;
-
-        // when:
-        cyclesPassed = cpu.Run(mem);
-
-        // then:
-        // Temporary disabled until cycles counter will be fixed
-        // CheckCyclesCount();
-
-        // Result of GxEx is always in register
-        EXPECT_EQ(*leftRegPtr, initialLeftReg & initialRightReg);
-    }
-
-    void AND_CanDo_AND_Gv_Ev(const WORD* leftRegPtr, WordRegisters leftRegName, const WORD* rightRegPtr, WordRegisters rightRegName) {
-        ModRegByteConstructor modReg;
-        modReg.leftOp.archetype = OperandArchetype::Reg;
-        modReg.leftOp.regData.wordReg = leftRegName;
-
-        modReg.rightOp.archetype = OperandArchetype::Reg;
-        modReg.rightOp.regData.wordReg = rightRegName;
-
-        AND_CanDo_AND_Gx_Ex(leftRegPtr, rightRegPtr, modReg);
-    }
-
-    void AND_CanDo_AND_Gb_Eb(const BYTE* leftRegPtr, ByteRegisters leftRegName, const BYTE* rightRegPtr, ByteRegisters rightRegName) {
-        ModRegByteConstructor modReg;
-        modReg.leftOp.archetype = OperandArchetype::Reg;
-        modReg.leftOp.regData.byteReg = leftRegName;
-
-        modReg.rightOp.archetype = OperandArchetype::Reg;
-        modReg.rightOp.regData.byteReg = rightRegName;
-
-        AND_CanDo_AND_Gx_Ex(leftRegPtr, rightRegPtr, modReg);
-    }
-
-    template<typename T>
-    void AND_CanDo_AND_AI(T initialValue, T memValue) {
-        // given:
-        if (std::is_same_v<T, BYTE>)
-            cpu.AL = initialValue;
-        else
-            cpu.AX = initialValue;
-
-        mem[effectiveAddress++] = std::is_same_v<T, BYTE> ? AND_AL_Ib : AND_AX_Iv;
-        mem[effectiveAddress++] = memValue & 0xFF;
-        if (!std::is_same_v<T, BYTE>)
-            mem[effectiveAddress++] = (memValue >> 8) & 0xFF;
-        mem[effectiveAddress] = STOP_OPCODE;
-
-        cyclesExpected = 4;
-
-        // when:
-        cyclesPassed = cpu.Run(mem);
-
-        // then:
-        // Temporary disabled until cycles counter will be fixed
-        // CheckCyclesCount();
-
-        EXPECT_EQ((std::is_same_v<T, BYTE> ? cpu.AL : cpu.AX), initialValue & memValue);
-    }
-};
+class I8086_AND_Fixture : public I8086_DoubleOpFixture {};
+class I8086_AND_IM_Fixture : public I8086_SingleOpFixture {};
 
 // Mem (BX addressed) <-- AX & Mem (BX addressed)
 TEST_F(I8086_AND_Fixture, AND_Ev_Gv_BX_Addressed_AX) {
@@ -132,8 +22,9 @@ TEST_F(I8086_AND_Fixture, AND_Ev_Gv_BX_Addressed_AX) {
 
     const WORD memValue = 0x12C;
     const DWORD memAddress = cpu.BX + (cpu.DS << 4);
+    const WORD refValue = cpu.AX & memValue;
 
-    AND_CanDo_AND_Ev_Gv(memAddress, memValue, cpu.AX, modReg);
+    TestMemRegInstruction(memAddress, memValue, refValue, AND_Ev_Gv, modReg, 16);
 }
 
 // Mem (Direct addressed) <-- BX & Mem (Direct addressed)
@@ -152,8 +43,9 @@ TEST_F(I8086_AND_Fixture, AND_Ev_Gv_Direct_Addressed_BX) {
     
     const WORD memValue = 0x12C;
     const DWORD memAddress = 0x1000;
-    
-    AND_CanDo_AND_Ev_Gv(memAddress, memValue, cpu.BX, modReg);
+    const WORD refValue = cpu.BX & memValue;
+
+    TestMemRegInstruction(memAddress, memValue, refValue, AND_Ev_Gv, modReg, 16);
 }
 
 // Mem (BP addressed WithDisp) <-- DX & Mem (BP addressed WithDisp)
@@ -174,8 +66,9 @@ TEST_F(I8086_AND_Fixture, AND_Ev_Gv_BP_Addressed_WithDisp_DX) {
     
     const WORD memValue = 0x12C;
     const DWORD memAddress = modReg.leftOp.memData.dispValue + (cpu.SS << 4);
-    
-    AND_CanDo_AND_Ev_Gv(memAddress, memValue, cpu.DX, modReg);
+    const WORD refValue = cpu.DX & memValue;
+
+    TestMemRegInstruction(memAddress, memValue, refValue, AND_Ev_Gv, modReg, 16);
 }
 
 // Mem (BX SI addressed WithDisp) <-- AX & Mem (BX SI addressed WithDisp)
@@ -198,78 +91,91 @@ TEST_F(I8086_AND_Fixture, AND_Ev_Gv_BXSI_Addressed_WithDisp_AX) {
 
     const WORD memValue = 0x12C;
     const DWORD memAddress = cpu.BX + cpu.SI + modReg.leftOp.memData.dispValue + (cpu.DS << 4);
-    
-    AND_CanDo_AND_Ev_Gv(memAddress, memValue, cpu.AX, modReg);
+    const WORD refValue = cpu.AX & memValue;
+
+    TestMemRegInstruction(memAddress, memValue, refValue, AND_Ev_Gv, modReg, 16);
 }
 
 // AX <-- AX & BX
 TEST_F(I8086_AND_Fixture, AND_Gv_Ev_AX_BX) {
     cpu.AX = 0x0060;
     cpu.BX = 0x009A;
+    const BYTE leftReg = wAX;
+    const BYTE rightReg = wBX;
+    const WORD refValue = cpu.AX & cpu.BX;
 
-    AND_CanDo_AND_Gv_Ev(&cpu.AX, wAX, &cpu.BX, wBX);
+    TestRegRegInstruction(&cpu.AX, &cpu.BX, refValue, &leftReg, &rightReg, AND_Gv_Ev, 16);
 }
 
 // BX <-- BX & DI
 TEST_F(I8086_AND_Fixture, AND_Gv_Ev_BX_DI) {
     cpu.BX = 0x0060;
     cpu.DI = 0x009A;
+    const BYTE leftReg = wBX;
+    const BYTE rightReg = wDI;
+    const WORD refValue = cpu.BX & cpu.DI;
 
-    AND_CanDo_AND_Gv_Ev(&cpu.BX, wBX, &cpu.DI, wDI);
+    TestRegRegInstruction(&cpu.BX, &cpu.DI, refValue, &leftReg, &rightReg, AND_Gv_Ev, 16);
 }
 
 // AL <-- AL & BH
 TEST_F(I8086_AND_Fixture, AND_Gb_Eb_AL_BH) {
     cpu.AL = 0x60;
     cpu.BH = 0x9A;
+    const BYTE leftReg = bAL;
+    const BYTE rightReg = bBH;
+    const BYTE refValue = cpu.AL & cpu.BH;
 
-    AND_CanDo_AND_Gb_Eb(&cpu.AL, bAL, &cpu.BH, bBH);
+    TestRegRegInstruction(&cpu.AL, &cpu.BH, refValue, &leftReg, &rightReg, AND_Gb_Eb, 16);
 }
 
 // BL <-- BL & CL
 TEST_F(I8086_AND_Fixture, AND_Gb_Eb_BL_CL) {
     cpu.BL = 0x0060;
     cpu.CL = 0x009A;
+    const BYTE leftReg = bBL;
+    const BYTE rightReg = bCL;
+    const BYTE refValue = cpu.BL & cpu.CL;
 
-    AND_CanDo_AND_Gb_Eb(&cpu.BL, bBL,&cpu.CL, bCL);
+    TestRegRegInstruction(&cpu.BL, &cpu.CL, refValue, &leftReg, &rightReg, AND_Gb_Eb, 16);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Ib_Test1) {
-    AND_CanDo_AND_AI<BYTE>(0x11, 0x22);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Ib_Test1) {
+    TestAccumulatorWithImmediateData<BYTE>(0x11, 0x22, 0x11 & 0x22, AND_AL_Ib, 4);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Ib_Test2) {
-    AND_CanDo_AND_AI<BYTE>(0x10, 0x01);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Ib_Test2) {
+    TestAccumulatorWithImmediateData<BYTE>(0x10, 0x01, 0x10 & 0x01, AND_AL_Ib, 4);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Ib_Test3) {
-    AND_CanDo_AND_AI<BYTE>(0x00, 0x00);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Ib_Test3) {
+    TestAccumulatorWithImmediateData<BYTE>(0x00, 0x00, 0x00 & 0x00, AND_AL_Ib, 4);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Ib_Test4) {
-    AND_CanDo_AND_AI<BYTE>(0xFF, 0xFF);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Ib_Test4) {
+    TestAccumulatorWithImmediateData<BYTE>(0xFF, 0xFF, 0xFF & 0xFF, AND_AL_Ib, 4);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Ib_Test5) {
-    AND_CanDo_AND_AI<BYTE>(0xFF, 0x00);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Ib_Test5) {
+    TestAccumulatorWithImmediateData<BYTE>(0xFF, 0x00, 0xFF & 0x00, AND_AL_Ib, 4);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Iv_Test1) {
-    AND_CanDo_AND_AI<WORD>(0x1111, 0x2222);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Iv_Test1) {
+    TestAccumulatorWithImmediateData<WORD>(0x1111, 0x2222, 0x1111 & 0x2222, AND_AX_Iv, 4);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Iv_Test2) {
-    AND_CanDo_AND_AI<WORD>(0x1010, 0x0101);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Iv_Test2) {
+    TestAccumulatorWithImmediateData<WORD>(0x1010, 0x0101, 0x1010 & 0x0101, AND_AX_Iv, 4);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Iv_Test3) {
-    AND_CanDo_AND_AI<WORD>(0x0000, 0x0000);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Iv_Test3) {
+    TestAccumulatorWithImmediateData<WORD>(0x0000, 0x0000, 0x0000 & 0x0000, AND_AX_Iv, 4);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Iv_Test4) {
-    AND_CanDo_AND_AI<WORD>(0xFFFF, 0xFFFF);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Iv_Test4) {
+    TestAccumulatorWithImmediateData<WORD>(0xFFFF, 0xFFFF, 0xFFFF & 0xFFFF, AND_AX_Iv, 4);
 }
 
-TEST_F(I8086_AND_Fixture, AND_AL_Iv_Test5) {
-    AND_CanDo_AND_AI<WORD>(0xFFFF, 0x0000);
+TEST_F(I8086_AND_IM_Fixture, AND_AL_Iv_Test5) {
+    TestAccumulatorWithImmediateData<WORD>(0xFFFF, 0x0000, 0xFFFF & 0x0000, AND_AX_Iv, 4);
 }

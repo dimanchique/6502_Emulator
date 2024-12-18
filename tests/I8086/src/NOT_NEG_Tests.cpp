@@ -19,7 +19,7 @@ TEST_F(I8086_NOT_NEG_Fixture, NOT_BX_Addressed_Mem) {
     const DWORD memAddress = cpu.BX + (cpu.DS << 4);
     const BYTE refValue = 0b10101010;
 
-    TestMemoryInstruction(memAddress, memValue, refValue, I8086_OpCodes::GRP3a_Eb, modReg, I8086_OpCods_GRP3a::GRP3a_NOT, 16);
+    TestMemoryInstruction(memAddress, memValue, refValue, GRP3a_Eb, modReg, GRP3a_NOT, 16);
     EXPECT_EQ(cpu.Status.C, 0);
 }
 
@@ -40,7 +40,7 @@ TEST_F(I8086_NOT_NEG_Fixture, NEG_BX_Addressed_Mem) {
     const DWORD memAddress = cpu.BX + (cpu.DS << 4);
     const WORD refValue = 0b10101010'10101011;
 
-    TestMemoryInstruction(memAddress, memValue, refValue, I8086_OpCodes::GRP3b_Ev, modReg, I8086_OpCods_GRP3b::GRP3b_NEG, 16);
+    TestMemoryInstruction(memAddress, memValue, refValue, GRP3b_Ev, modReg, GRP3b_NEG, 16);
     EXPECT_EQ(cpu.Status.C, 1);
 }
 
@@ -50,7 +50,7 @@ TEST_F(I8086_NOT_NEG_Fixture, NOT_BH_Reg) {
     cpu.BH = 0b00000000;
     const BYTE refValue = 0b11111111;
 
-    TestRegisterInstruction(&cpu.BH, refValue, I8086_OpCodes::GRP3a_Eb, &reg, I8086_OpCods_GRP3a::GRP3a_NOT, 16);
+    TestRegisterInstruction(&cpu.BH, refValue, GRP3a_Eb, &reg, GRP3a_NOT, 16);
     EXPECT_EQ(cpu.Status.C, 0);
 }
 
@@ -60,6 +60,6 @@ TEST_F(I8086_NOT_NEG_Fixture, NEG_CX_Reg) {
     cpu.CX = 0b11001100'11001100;
     const WORD refValue = 0b00110011'11001100;
 
-    TestRegisterInstruction(&cpu.CX, refValue, I8086_OpCodes::GRP3a_Eb, &reg, I8086_OpCods_GRP3a::GRP3a_NOT, 16);
+    TestRegisterInstruction(&cpu.CX, refValue, GRP3a_Eb, &reg, GRP3a_NOT, 16);
     EXPECT_EQ(cpu.Status.C, 0);
 }
