@@ -146,7 +146,7 @@ public:
      * @param memory Memory struct instance.
      */
     FORCE_INLINE void PushStatusToStack(Memory &memory) {
-        WriteByte(memory, Status, StackPointerToAddress());
+        WriteByte(memory, Status.Value, StackPointerToAddress());
         SP--;
         cycles++;
     }
@@ -160,7 +160,7 @@ public:
     FORCE_INLINE void PopStatusFromStack(const Memory &memory) {
         SP++;
         cycles++;
-        Status = ReadByte(memory, StackPointerToAddress());
+        Status.Value = ReadByte(memory, StackPointerToAddress());
         cycles++;
     }
 

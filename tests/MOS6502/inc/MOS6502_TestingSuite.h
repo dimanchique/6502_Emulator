@@ -26,8 +26,8 @@ public:
 
     void SetStatusBitByMask(BYTE mask, BYTE value) {
         if (value)
-            cpu.Status = cpu.Status | mask;
+            cpu.Status.Value |= mask;
         else
-            cpu.Status = cpu.Status & ~mask;
+            cpu.Status.Value &= ~mask;
     }
 };

@@ -4,7 +4,7 @@
 void MOS6502::Reset(Memory &memory) noexcept {
     SP = 0xFF;
 
-    Status = 0;
+    Status.Value = 0;
     A = X = Y = 0;
     cycles = 0;
 

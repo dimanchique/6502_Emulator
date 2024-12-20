@@ -16,7 +16,7 @@ public:
         cyclesPassed = cpu.Run(mem);
 
         // then:
-        EXPECT_FALSE(cpu.Status & statusFlag);
+        EXPECT_FALSE(cpu.Status.Value & statusFlag);
         CheckCyclesCount();
     }
 };
