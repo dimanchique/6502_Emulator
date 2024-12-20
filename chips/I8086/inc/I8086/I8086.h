@@ -6,7 +6,6 @@
 #include "base/compute.h"
 #include "base/memory.h"
 #include "I8086_Addressing.h"
-#include <type_traits>
 #include <cassert>
 
 #define STOP_OPCODE I8086_OpCodes::HLT // HLT instruction is pretty OK to use as a STOP opcode
@@ -54,7 +53,7 @@ public:
     FORCE_INLINE T Fetch(const Memory &memory) {
         cycles += 1;
         BYTE ll = FetchByte(memory);
-        if constexpr (std::is_same_v<T, BYTE>)
+        if (std::is_same_v<T, BYTE>)
             return ll;
         BYTE hh = FetchByte(memory);
         return (hh << 8) | ll;
@@ -68,7 +67,7 @@ public:
     template<typename T>
     FORCE_INLINE T Read(Memory &memory, const DWORD address) {
         BYTE ll = ReadByte(memory, address);
-        if constexpr (std::is_same_v<T, BYTE>)
+        if (std::is_same_v<T, BYTE>)
             return ll;
         BYTE hh = ReadByte(memory, address + 1);
 
@@ -85,7 +84,7 @@ public:
     template<typename T>
     FORCE_INLINE void Write(Memory &memory, const DWORD address, const T value) {
         WriteByte(memory, address, value & 0xFF);
-        if constexpr (std::is_same_v<T, BYTE>)
+        if (std::is_same_v<T, BYTE>)
             return;
         WriteByte(memory, address + 1, (value >> 8) & 0xFF);
     }
@@ -241,7 +240,7 @@ public:
             case 0b111:
                 return GetBasedAddress(memory, BX, modReg.mod);
         }
-        throw; // invalid case; something went wrong
+        throw InvalidInstruction();
     }
 
 private:

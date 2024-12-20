@@ -17,7 +17,6 @@
 struct I8086_Status {
     union {
         struct {
-
             WORD C      : 1;             // Carry Flag
             WORD        : 1;             // Not Used
             WORD P      : 1;             // Parity Flag

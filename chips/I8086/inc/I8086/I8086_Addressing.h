@@ -2,9 +2,15 @@
 
 #include "core/types.h"
 #include "core/compilers_macro.h"
+#include "exception"
 
 class I8086;
 struct Memory;
+
+class InvalidInstruction : public std::invalid_argument {
+public:
+    InvalidInstruction() : std::invalid_argument("Invalid instruction encountered") {}
+};
 
 template<typename T>
 using OperandSetter = void (*)(I8086 &, Memory &, const void *, T);

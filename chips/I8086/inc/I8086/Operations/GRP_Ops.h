@@ -13,51 +13,34 @@ using GRP_CallbackSignature = void (*)(I8086&, Memory&, const ModRegByte&);
 
 template<typename T>
 void GRP_InvalidCall(I8086&, Memory&, const ModRegByte&) {
-    throw EXIT_FAILURE;
+    throw InvalidInstruction();
+}
+
+template<typename T>
+FORCE_INLINE void I8086_GRP1_Ex_Ix(Memory &memory, I8086 &cpu) {
+    const BYTE modByte = cpu.Fetch<BYTE>(memory);
+    const ModRegByte modReg = ModRegByte::FromByte(modByte);
+
+    static constexpr GRP_CallbackSignature<T> callMap[] = {
+            &GRP_InvalidCall<T>,    // 000 -> ADD
+            &I8086_OR_Ex_Ix<T>,     // 001 -> OR
+            &GRP_InvalidCall<T>,    // 010 -> ADC
+            &GRP_InvalidCall<T>,    // 011 -> SBB
+            &I8086_AND_Ex_Ix<T>,    // 100 -> AND
+            &GRP_InvalidCall<T>,    // 101 -> SUB
+            &I8086_XOR_Ex_Ix<T>,    // 110 -> XOR
+            &GRP_InvalidCall<T>     // 111 -> CMP
+    };
+
+    callMap[modReg.reg](cpu, memory, modReg);
 }
 
 void I8086_GRP1_Eb_Ib(BYTE OpCode, Memory &memory, I8086 &cpu) {
-    const BYTE modByte = cpu.Fetch<BYTE>(memory);
-    const ModRegByte modReg = ModRegByte::FromByte(modByte);
-    switch (modReg.reg) {
-        case 0b000: // ADD
-            return;
-        case 0b001: // OR
-            I8086_OR_Eb_Ib(memory, cpu, modReg);
-        case 0b010: // ADC
-        case 0b011: // SBB
-            return;
-        case 0b100: // AND
-            I8086_AND_Eb_Ib(memory, cpu, modReg);
-        case 0b101: // SUB
-            return;
-        case 0b110: // XOR
-            I8086_XOR_Eb_Ib(memory, cpu, modReg);
-        case 0b111: // CMP
-            return;
-    }
+    I8086_GRP1_Ex_Ix<BYTE>(memory, cpu);
 }
 
 void I8086_GRP1_Ev_Iv(BYTE OpCode, Memory &memory, I8086 &cpu) {
-    const BYTE modByte = cpu.Fetch<BYTE>(memory);
-    const ModRegByte modReg = ModRegByte::FromByte(modByte);
-    switch (modReg.reg) {
-        case 0b000: // ADD
-            return;
-        case 0b001: // OR
-            I8086_OR_Ev_Iv(memory, cpu, modReg);
-        case 0b010: // ADC
-        case 0b011: // SBB
-            return;
-        case 0b100: // AND
-            I8086_AND_Ev_Iv(memory, cpu, modReg);
-        case 0b101: // SUB
-            return;
-        case 0b110: // XOR
-            I8086_XOR_Ev_Iv(memory, cpu, modReg);
-        case 0b111: // CMP
-            return;
-    }
+    I8086_GRP1_Ex_Ix<WORD>(memory, cpu);
 }
 
 template<typename T>
