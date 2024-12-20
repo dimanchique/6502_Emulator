@@ -39,7 +39,6 @@ TEST_F(I8080_PUSHFixture, PUSH_CanPushH) {
 
 TEST_F(I8080_PUSHFixture, PUSH_CanPushPSW) {
     cpu.A = 0xDD;
-    cpu.Status = 0xEE;
-    PUSH_CanPush(PUSH_PSW, cpu.A, cpu.Status);
+    cpu.Status.Value = 0xEE;
+    PUSH_CanPush(PUSH_PSW, cpu.A, cpu.Status.Value);
 }
-

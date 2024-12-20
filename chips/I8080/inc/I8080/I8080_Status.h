@@ -16,23 +16,19 @@
  * The vast majority of instructions change Status Register state
  */
 struct I8080_Status{
-    BYTE C      :1;             /**< Carry Flag */
-    BYTE        :1;             /**< Not Used */
-    BYTE P      :1;             /**< Parity Flag */
-    BYTE        :1;             /**< Not Used */
-    BYTE AC     :1;             /**< Auxiliary Carry Flag */
-    BYTE        :1;             /**< Not Used */
-    BYTE Z      :1;             /**< Zero Flag */
-    BYTE S      :1;             /**< Sign Flag */
-
-    operator BYTE() const noexcept {
-        return *(BYTE *) (this);
-    }
-
-    FORCE_INLINE I8080_Status &operator=(const BYTE referenceByte) {
-        *(BYTE *) (this) = referenceByte;
-        return *this;
-    }
+    union {
+        struct {
+            BYTE C: 1;             /**< Carry Flag */
+            BYTE        : 1;             /**< Not Used */
+            BYTE P: 1;             /**< Parity Flag */
+            BYTE        : 1;             /**< Not Used */
+            BYTE AC: 1;             /**< Auxiliary Carry Flag */
+            BYTE        : 1;             /**< Not Used */
+            BYTE Z: 1;             /**< Zero Flag */
+            BYTE S: 1;             /**< Sign Flag */
+        };
+        BYTE Value;
+    };
 
     /**
      * @brief Update status register using given value.

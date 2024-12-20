@@ -4,7 +4,7 @@ class I8080_SUBFixture : public I8080_TestFixture {
 public:
     void SUB_A_CanZeroAccumulator(const BYTE initialValue, const I8080_Status &expectedStatus) {
         // given:
-        cpu.Status = 0;
+        cpu.Status.Value = 0;
         cpu.A = initialValue;
         mem[0x0000] = SUB_A;
         mem[0x0001] = STOP_OPCODE;
@@ -28,7 +28,7 @@ public:
                                                          const I8080_Status &expectedStatus,
                                                          const U32 cycles = 4) {
         // given:
-        cpu.Status = 0;
+        cpu.Status.Value = 0;
         cpu.A = initialValue;
         mem[0x0000] = opcode;
         mem[opcode == SUI ? 0x0002 : 0x0001] = STOP_OPCODE;

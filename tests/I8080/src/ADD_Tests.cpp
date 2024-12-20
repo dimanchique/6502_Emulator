@@ -5,7 +5,7 @@ public:
     void ADD_A_CanDoubleAccumulator(const BYTE initialValue, const BYTE expectedValue,
                                     const I8080_Status expectedStatus) {
         // given:
-        cpu.Status = 0;
+        cpu.Status.Value = 0;
         cpu.A = initialValue;
         mem[0x0000] = ADD_A;
         mem[0x0001] = STOP_OPCODE;
@@ -28,7 +28,7 @@ public:
                                                   const I8080_Status expectedStatus,
                                                   const U32 cycles = 4) {
         // given:
-        cpu.Status = 0;
+        cpu.Status.Value = 0;
         cpu.A = initialValue;
         mem[0x0000] = opcode;
         mem[opcode == ADI ? 0x0002 : 0x0001] = STOP_OPCODE;

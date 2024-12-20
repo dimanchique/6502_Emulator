@@ -5,7 +5,7 @@ public:
     void SBB_A_CanSBBAccumulator(const BYTE initialValue, const BYTE expectedValue,
                                     const I8080_Status expectedStatus, const BYTE carry) {
         // given:
-        cpu.Status = 0;
+        cpu.Status.Value = 0;
         cpu.Status.C = carry;
         cpu.A = initialValue;
         mem[0x0000] = SBB_A;
@@ -30,7 +30,7 @@ public:
                                                   const I8080_Status expectedStatus,
                                                   const U32 cycles = 4) {
         // given:
-        cpu.Status = 0;
+        cpu.Status.Value = 0;
         cpu.Status.C = carry;
         cpu.A = initialValue;
         mem[0x0000] = opcode;

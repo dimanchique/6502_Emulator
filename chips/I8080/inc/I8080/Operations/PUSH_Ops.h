@@ -42,5 +42,5 @@ void I8080_PUSH_H(Memory &memory, I8080 &cpu) {
  * @param cpu I8080 struct instance.
  */
 void I8080_PUSH_PSW(Memory &memory, I8080 &cpu) {
-    cpu.PushDataToStack(memory, cpu.A, cpu.Status);
+    cpu.PushDataToStack(memory, cpu.A, cpu.Status.Value);
 }

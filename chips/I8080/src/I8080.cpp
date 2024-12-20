@@ -4,7 +4,7 @@
 void I8080::Reset(Memory &memory) noexcept {
     PC = 0x0000;
     SP = 0xFFFF;
-    Status = 0;
+    Status.Value = 0;
 
     // Accumulator and general-purpose registers are not defined after reset and may contain arbitrary values.
     cycles = 0;
