@@ -137,8 +137,8 @@
 - [ ] WAIT
 - [ ] PUSHF
 - [ ] POPF
-- [ ] SAHF
-- [ ] LAHF
+- [x] SAHF
+- [x] LAHF
 - [ ] MOV_AL_Ob
 - [ ] MOV_AX_Ov
 - [ ] MOV_Ob_AL
