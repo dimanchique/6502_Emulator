@@ -48,3 +48,25 @@ TEST_F(I8086_ST_CL_Fixture, CLD_CanClearDirection) {
 TEST_F(I8086_ST_CL_Fixture, CL_CanClearInterrupt) {
     CL_CanClearFlag(CLI, I8086_Status_I);
 }
+
+TEST_F(I8086_ST_CL_Fixture, CMC_CanComplimentCarry_1) {
+    // given:
+    cpu.Status.C = 1;
+
+    // when:
+    TestImpliedInstruction(CMC);
+
+    // then:
+    EXPECT_EQ(cpu.Status.C, 0);
+}
+
+TEST_F(I8086_ST_CL_Fixture, CMC_CanComplimentCarry_2) {
+    // given:
+    cpu.Status.C = 0;
+
+    // when:
+    TestImpliedInstruction(CMC);
+
+    // then:
+    EXPECT_EQ(cpu.Status.C, 1);
+}

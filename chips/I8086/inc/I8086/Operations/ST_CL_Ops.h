@@ -14,6 +14,10 @@ void I8086_CLI(BYTE OpCode, Memory &memory, I8086 &cpu) {
     cpu.Status.I = 0;
 }
 
+void I8086_CMC(BYTE OpCode, Memory &memory, I8086 &cpu) {
+    cpu.Status.C = !cpu.Status.C;
+}
+
 void I8086_STI(BYTE OpCode, Memory &memory, I8086 &cpu) {
     cpu.Status.I = 1;
 }

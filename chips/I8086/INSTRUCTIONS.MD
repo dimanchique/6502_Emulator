@@ -210,7 +210,7 @@
 - [ ] REPNZ
 - [ ] REPZ
 - [ ] HLT
-- [ ] CMC
+- [x] CMC
 - [x] GRP3a_Eb
 - [x] GRP3b_Ev
 - [x] CLC
