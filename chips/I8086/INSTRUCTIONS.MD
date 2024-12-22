@@ -131,8 +131,8 @@
 - [ ] XCHG_BP_AX
 - [ ] XCHG_SI_AX
 - [ ] XCHG_DI_AX
-- [ ] CBW
-- [ ] CWD
+- [x] CBW
+- [x] CWD
 - [ ] CALL_Ap
 - [ ] WAIT
 - [ ] PUSHF
