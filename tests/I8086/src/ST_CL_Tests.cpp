@@ -1,28 +1,13 @@
-#include "I8086_TestingSuite.h"
+#include "I8086_ImpliedOpTests.h"
 
-class I8086_ST_CL_Fixture : public I8086_TestFixture {
+class I8086_ST_CL_Fixture : public I8086_ImpliedOpTests {
 public:
-    void ST_CL_Test(I8086_OpCodes opCode) {
-        // given:
-        mem[effectiveAddress++] = opCode;
-        mem[effectiveAddress] = STOP_OPCODE;
-
-        cyclesExpected = 4;
-
-        // when:
-        cyclesPassed = cpu.Run(mem);
-
-        // then:
-        // Temporary disabled until cycles counter will be fixed
-        // CheckCyclesCount();
-    }
-
     void ST_CanSetFlag(I8086_OpCodes opCode, const WORD statusFieldMask) {
         // given:
         cpu.Status.Value &= ~statusFieldMask;
 
         // when:
-        ST_CL_Test(opCode);
+        TestImpliedInstruction(opCode);
 
         // then:
         EXPECT_EQ(cpu.Status.Value & statusFieldMask, statusFieldMask);
@@ -33,7 +18,7 @@ public:
         cpu.Status.Value |= statusFieldMask;
 
         // when:
-        ST_CL_Test(opCode);
+        TestImpliedInstruction(opCode);
 
         // then:
         EXPECT_EQ(cpu.Status.Value & statusFieldMask, 0);
