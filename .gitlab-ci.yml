@@ -1,6 +1,4 @@
-image:
-  name: resim_base_image:v2
-  pull_policy: never
+image: resim_base_image:latest
 
 stages:
   - build
@@ -12,5 +10,5 @@ build:
   script:
     - mkdir build
     - cd build && cmake .. -DRESIM_BUILD_TESTING=ON -GNinja
-    - ninja -C .
-    - ctest -V -j 5
+    - ninja -C . -j 4
+    - ctest -V -j 4
