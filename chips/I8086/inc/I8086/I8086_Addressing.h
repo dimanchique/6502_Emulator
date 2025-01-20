@@ -2,7 +2,6 @@
 
 #include "core/types.h"
 #include "core/compilers_macro.h"
-#include "exception"
 
 class I8086;
 struct Memory;
@@ -28,7 +27,7 @@ struct ModRegByte {
         BYTE value = 0;
     };
 
-    FORCE_INLINE static ModRegByte FromByte(BYTE value) {
+    FORCE_INLINE static ModRegByte FromByte(const BYTE value) {
         ModRegByte modReg;
         modReg.value = value;
         return modReg;

@@ -2,7 +2,7 @@
 
 #include "core/types.h"
 
-struct I8086;
+class I8086;
 struct Memory;
 
 /**

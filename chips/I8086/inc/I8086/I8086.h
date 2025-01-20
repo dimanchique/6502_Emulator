@@ -43,7 +43,7 @@ public:
     U32 Run(Memory &memory) override;
 
     FORCE_INLINE BYTE FetchByte(const Memory &memory) {
-        DWORD EffectiveAddress = EFFECTIVE_ADDRESS(PC, CS);
+        const DWORD EffectiveAddress = EFFECTIVE_ADDRESS(PC, CS);
         PC++;
         cycles++;
         return memory[EffectiveAddress];
@@ -52,10 +52,10 @@ public:
     template<typename T>
     FORCE_INLINE T Fetch(const Memory &memory) {
         cycles += 1;
-        BYTE ll = FetchByte(memory);
+        const BYTE ll = FetchByte(memory);
         if (std::is_same_v<T, BYTE>)
             return ll;
-        BYTE hh = FetchByte(memory);
+        const BYTE hh = FetchByte(memory);
         return (hh << 8) | ll;
     }
 
@@ -66,10 +66,10 @@ public:
 
     template<typename T>
     FORCE_INLINE T Read(Memory &memory, const DWORD address) {
-        BYTE ll = ReadByte(memory, address);
+        const BYTE ll = ReadByte(memory, address);
         if (std::is_same_v<T, BYTE>)
             return ll;
-        BYTE hh = ReadByte(memory, address + 1);
+        const BYTE hh = ReadByte(memory, address + 1);
 
         // Additional 4 cycles for WORD read of odd address
         if (address & 0x01)
@@ -156,7 +156,7 @@ public:
     // 111 | BH  | DI
 
     template<typename T>
-    InstructionData<T> GetInstructionDataNoFetch(Memory &memory, OperandSize operandSize, InstructionDirection direction, const ModRegByte modReg, bool isSRegInstruction = false) {
+    InstructionData<T> GetInstructionDataNoFetch(Memory &memory, const OperandSize operandSize, const InstructionDirection direction, const ModRegByte modReg, bool isSRegInstruction = false) {
         InstructionData<T> instructionData{};
 
         // Pre-calculate target registers pointers
@@ -213,7 +213,7 @@ public:
     }
 
     template<typename T>
-    InstructionData<T> GetInstructionData(Memory &memory, OperandSize operandSize, InstructionDirection direction, bool isSRegInstruction = false) {
+    InstructionData<T> GetInstructionData(Memory &memory, const OperandSize operandSize, const InstructionDirection direction, const bool isSRegInstruction = false) {
         const BYTE modByte = Fetch<BYTE>(memory);
         const ModRegByte modReg = ModRegByte::FromByte(modByte);
         return GetInstructionDataNoFetch<T>(memory, operandSize, direction, modReg, isSRegInstruction);
@@ -271,7 +271,7 @@ private:
     // Effective address is taken directly from the displacement field of the instruction
     // Takes 6 cycles
     FORCE_INLINE DWORD GetDirectAddress(const Memory &memory) {
-        WORD offset = Fetch<WORD>(memory);
+        const WORD offset = Fetch<WORD>(memory);
         return EFFECTIVE_ADDRESS(offset, *currentSegment);
     }
 
@@ -327,21 +327,21 @@ private:
     }
 
     // REG | R/M should be passed
-    BYTE *GetRegBytePtr(BYTE modByte) {
+    BYTE *GetRegBytePtr(const BYTE modByte) {
         assert(modByte <= 7);
         BYTE *regTable[] = {&AL, &CL, &DL, &BL, &AH, &CH, &DH, &BH};
         return regTable[modByte];
     }
 
     // REG | R/M should be passed
-    WORD *GetRegWordPtr(BYTE modByte) {
+    WORD *GetRegWordPtr(const BYTE modByte) {
         assert(modByte <= 7);
         WORD *regTable[] = {&AX, &CX, &DX, &BX, &SP, &BP, &SI, &DI};
         return regTable[modByte];
     }
 
     // REG | R/M should be passed
-    WORD *GetSRegWordPtr(BYTE modByte) {
+    WORD *GetSRegWordPtr(const BYTE modByte) {
         assert(modByte <= 7);
         WORD *regTable[] = {&ES, &CS, &SS, nullptr, nullptr, nullptr, &DS, nullptr};
         return regTable[modByte];

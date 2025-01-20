@@ -7,6 +7,7 @@
 #include "ROR_RCR_SAR_SHR_Ops.h"
 #include "ROL_RCL_SAL_SHL_Ops.h"
 #include "NOT_NEG_Ops.h"
+#include "INC_DEC_Ops.h"
 
 template<typename T>
 using GRP_CallbackSignature = void (*)(I8086&, Memory&, const ModRegByte&);
@@ -122,4 +123,50 @@ void I8086_GRP3a_Eb(BYTE OpCode, Memory &memory, I8086 &cpu) {
 
 void I8086_GRP3b_Ev(BYTE OpCode, Memory &memory, I8086 &cpu) {
     I8086_GRP3x_Ex<WORD>(memory, cpu);
+}
+
+template<typename T>
+FORCE_INLINE void I8086_GRP4_Ex(Memory &memory, I8086 &cpu) {
+    const BYTE modByte = cpu.Fetch<BYTE>(memory);
+    const ModRegByte modReg = ModRegByte::FromByte(modByte);
+
+    static constexpr GRP_CallbackSignature<T> callMap[] = {
+        &INC_GRP4_Eb<T>,        // 000 -> INC
+        &DEC_GRP4_Eb<T>,        // 001 -> DEC
+        &GRP_InvalidCall<T>,    // 010 -> INVALID
+        &GRP_InvalidCall<T>,    // 011 -> INVALID
+        &GRP_InvalidCall<T>,    // 100 -> INVALID
+        &GRP_InvalidCall<T>,    // 101 -> INVALID
+        &GRP_InvalidCall<T>,    // 110 -> INVALID
+        &GRP_InvalidCall<T>,    // 111 -> INVALID
+};
+
+    callMap[modReg.reg](cpu, memory, modReg);
+}
+
+void I8086_GRP4_Eb(BYTE OpCode, Memory &memory, I8086 &cpu) {
+    I8086_GRP4_Ex<BYTE>(memory, cpu);
+}
+
+template<typename T>
+FORCE_INLINE void I8086_GRP5_Ex(Memory &memory, I8086 &cpu) {
+    const BYTE modByte = cpu.Fetch<BYTE>(memory);
+    const ModRegByte modReg = ModRegByte::FromByte(modByte);
+
+    static constexpr GRP_CallbackSignature<T> callMap[] = {
+        &INC_GRP5_Ev<T>,        // 000 -> INC
+        &DEC_GRP5_Ev<T>,        // 001 -> DEC
+        &GRP_InvalidCall<T>,    // 010 -> CALL
+        &GRP_InvalidCall<T>,    // 011 -> CALL Mp
+        &GRP_InvalidCall<T>,    // 100 -> JMP
+        &GRP_InvalidCall<T>,    // 101 -> JMP Mp
+        &GRP_InvalidCall<T>,    // 110 -> PUSH
+        &GRP_InvalidCall<T>,    // 111 -> INVALID
+};
+
+    callMap[modReg.reg](cpu, memory, modReg);
+}
+
+void I8086_GRP5_Ev(BYTE OpCode, Memory &memory, I8086 &cpu) {
+    I8086_GRP5_Ex<WORD>(memory, cpu);
 }

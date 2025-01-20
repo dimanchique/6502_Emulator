@@ -219,5 +219,5 @@
 - [x] STI
 - [x] CLD
 - [x] STD
-- [ ] GRP4_Eb
-- [ ] GRP5_E
+- [x] GRP4_Eb
+- [x] GRP5_E

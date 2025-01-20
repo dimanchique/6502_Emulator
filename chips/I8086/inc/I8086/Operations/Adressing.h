@@ -12,7 +12,7 @@ using StatusCallback = void(I8086&, const InstructionResult<T>&);
 // Works with Ex,Gx/Gx,Ex instructions
 // Result will be stored in left operand on instruction
 template<typename T>
-FORCE_INLINE void I8086_EGx_EGx(Memory &memory, I8086 &cpu, InstructionCallback<T> *callback, StatusCallback<T> *statusCallback, InstructionDirection direction) {
+FORCE_INLINE void I8086_EGx_EGx(Memory &memory, I8086 &cpu, InstructionCallback<T> *callback, StatusCallback<T> *statusCallback, const InstructionDirection direction) {
     InstructionResult<T> instructionResult{};
     const OperandSize opSize = std::is_same_v<T, BYTE> ? OperandSize::BYTE : OperandSize::WORD;
     const InstructionData instructionData = cpu.GetInstructionData<T>(memory, opSize, direction);

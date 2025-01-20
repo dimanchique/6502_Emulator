@@ -34,11 +34,6 @@ struct I8086_Status {
         WORD Value;
     };
 
-    FORCE_INLINE I8086_Status &operator=(const WORD referenceByte) {
-        *(WORD *) (this) = referenceByte;
-        return *this;
-    }
-
     template<typename OperandType>
     FORCE_INLINE void UpdateStatusByValue(const OperandType &checkValue, const WORD mask) {
         if (mask & I8086_Status_Z) {
