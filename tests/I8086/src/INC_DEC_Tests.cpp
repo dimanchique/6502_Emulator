@@ -1,6 +1,8 @@
 #include "I8086_GroupTests.h"
+#include "I8086_ImpliedOpTests.h"
 
 class I8086_INC_DEC_Fixture : public I8086_GroupFixture {};
+class I8086_INC_DEC_Word_Fixture : public I8086_ImpliedOpTests {};
 
 TEST_F(I8086_INC_DEC_Fixture, INC_Eb_Addressed_Mem) {
     ModRegByteConstructor modReg;
@@ -9,7 +11,6 @@ TEST_F(I8086_INC_DEC_Fixture, INC_Eb_Addressed_Mem) {
     modReg.leftOp.memData.dispSize = 0;
     modReg.leftOp.memData.mode = modeBX;
 
-    cpu.Status.C = 0;
     cpu.Status.O = 0;
     cpu.AX = 0x0060;
     cpu.BX = 0x009A;
@@ -25,7 +26,6 @@ TEST_F(I8086_INC_DEC_Fixture, INC_Eb_Addressed_Mem) {
 
 TEST_F(I8086_INC_DEC_Fixture, INC_Eb_BH_Reg) {
     const BYTE reg = bBH;
-    cpu.Status.C = 0;
     cpu.Status.O = 0;
     cpu.BH = 0b01010101;
     const BYTE refValue = 0b01010110;
@@ -35,7 +35,6 @@ TEST_F(I8086_INC_DEC_Fixture, INC_Eb_BH_Reg) {
 
 TEST_F(I8086_INC_DEC_Fixture, DEC_Eb_AH_Reg) {
     const BYTE reg = bAH;
-    cpu.Status.C = 0;
     cpu.Status.O = 0;
     cpu.AH = 0b10000000;
     const BYTE refValue = 0b01111111;
@@ -43,22 +42,48 @@ TEST_F(I8086_INC_DEC_Fixture, DEC_Eb_AH_Reg) {
     TestRegisterInstruction(&cpu.AH, refValue, GRP4_Eb, &reg, GRP4_DEC, 16);
 }
 
-TEST_F(I8086_INC_DEC_Fixture, INC_Ev_AX_Reg) {
-    const BYTE reg = wAX;
-    cpu.Status.C = 0;
+/**
+ *
+ * INC/DEC Word Test Suite
+ *
+ */
+
+TEST_F(I8086_INC_DEC_Word_Fixture, INC_AX) {
     cpu.Status.O = 0;
     cpu.AX = 0b11111111'11111111;
     const WORD refValue = 0b00000000'00000000;
 
-    TestRegisterInstruction(&cpu.AX, refValue, GRP5_Ev, &reg, GRP5_INC, 16);
+    TestImpliedInstruction(INC_AX);
+    EXPECT_EQ(cpu.AX, refValue);
+    EXPECT_TRUE(cpu.Status.O);
 }
 
-TEST_F(I8086_INC_DEC_Fixture, DEC_Ev_DX_Reg) {
-    const BYTE reg = wDX;
-    cpu.Status.C = 0;
+TEST_F(I8086_INC_DEC_Word_Fixture, DEC_BX) {
     cpu.Status.O = 0;
-    cpu.DX = 0b00000000'00000000;
+    cpu.BX = 0b00000000'00000000;
     const WORD refValue = 0b11111111'11111111;
 
-    TestRegisterInstruction(&cpu.DX, refValue, GRP5_Ev, &reg, GRP5_DEC, 16);
+    TestImpliedInstruction(DEC_BX);
+    EXPECT_EQ(cpu.BX, refValue);
+    EXPECT_TRUE(cpu.Status.O);
+}
+
+TEST_F(I8086_INC_DEC_Word_Fixture, INC_SP) {
+    cpu.Status.O = 0;
+    cpu.SP = 0b00000000'11111111;
+    const WORD refValue = 0b00000001'00000000;
+
+    TestImpliedInstruction(INC_SP);
+    EXPECT_EQ(cpu.SP, refValue);
+    EXPECT_FALSE(cpu.Status.O);
+}
+
+TEST_F(I8086_INC_DEC_Word_Fixture, DEC_SI) {
+    cpu.Status.O = 0;
+    cpu.SI = 0b00000001'00000000;
+    const WORD refValue = 0b00000000'11111111;
+
+    TestImpliedInstruction(DEC_SI);
+    EXPECT_EQ(cpu.SI, refValue);
+    EXPECT_FALSE(cpu.Status.O);
 }
