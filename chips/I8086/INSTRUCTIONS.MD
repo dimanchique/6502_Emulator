@@ -61,22 +61,22 @@
 - [ ] CMP_AX_Iv
 - [ ] DS
 - [ ] AAS
-- [ ] INC_AX
-- [ ] INC_CX
-- [ ] INC_DX
-- [ ] INC_BX
-- [ ] INC_SP
-- [ ] INC_BP
-- [ ] INC_SI
-- [ ] INC_DI
-- [ ] DEC_AX
-- [ ] DEC_CX
-- [ ] DEC_DX
-- [ ] DEC_BX
-- [ ] DEC_SP
-- [ ] DEC_BP
-- [ ] DEC_SI
-- [ ] DEC_DI
+- [x] INC_AX
+- [x] INC_CX
+- [x] INC_DX
+- [x] INC_BX
+- [x] INC_SP
+- [x] INC_BP
+- [x] INC_SI
+- [x] INC_DI
+- [x] DEC_AX
+- [x] DEC_CX
+- [x] DEC_DX
+- [x] DEC_BX
+- [x] DEC_SP
+- [x] DEC_BP
+- [x] DEC_SI
+- [x] DEC_DI
 - [ ] PUSH_AX
 - [ ] PUSH_CX
 - [ ] PUSH_DX

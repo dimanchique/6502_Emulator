@@ -243,8 +243,6 @@ public:
         throw InvalidInstruction();
     }
 
-private:
-
     // Getters/Setters for instruction data operands
     template<typename T>
     static void AddressSet(I8086 &cpu, Memory &memory, const void *address, T value) {
