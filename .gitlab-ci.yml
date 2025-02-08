@@ -11,4 +11,4 @@ build:
     - mkdir build
     - cd build && cmake .. -DRESIM_BUILD_TESTING=ON -GNinja
     - ninja -C . -j 4
-    - ctest -V -j 4
+    - ctest -V -j 2
