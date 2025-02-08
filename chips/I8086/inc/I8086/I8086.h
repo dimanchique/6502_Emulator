@@ -89,6 +89,23 @@ public:
         WriteByte(memory, address + 1, (value >> 8) & 0xFF);
     }
 
+    FORCE_INLINE void PushDataToStack(Memory &memory, const WORD data) {
+        DWORD stackPointerAddress = EFFECTIVE_ADDRESS(SP, SS);
+        Write<BYTE>(memory, --stackPointerAddress, (data & 0xFF00) >> 8);
+        SP--;
+        Write<BYTE>(memory, --stackPointerAddress, data & 0xFF);
+        SP--;
+    }
+
+    FORCE_INLINE WORD PopDataFromStack(Memory &memory) {
+        DWORD stackPointerAddress = EFFECTIVE_ADDRESS(SP, SS);
+        const BYTE ll = ReadByte(memory, stackPointerAddress++);
+        SP++;
+        const BYTE hh = ReadByte(memory, stackPointerAddress++);
+        SP++;
+        return hh << 8 | ll;
+    }
+
     // Override segment register
     // Current segment is a segment used to calculate EFFECTIVE ADDRESS
     // Default is DS

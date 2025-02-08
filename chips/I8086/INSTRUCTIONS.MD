@@ -77,22 +77,22 @@
 - [x] DEC_BP
 - [x] DEC_SI
 - [x] DEC_DI
-- [ ] PUSH_AX
-- [ ] PUSH_CX
-- [ ] PUSH_DX
-- [ ] PUSH_BX
-- [ ] PUSH_SP
-- [ ] PUSH_BP
-- [ ] PUSH_SI
-- [ ] PUSH_DI
-- [ ] POP_AX
-- [ ] POP_CX
-- [ ] POP_DX
-- [ ] POP_BX
-- [ ] POP_SP
-- [ ] POP_BP
-- [ ] POP_SI
-- [ ] POP_DI
+- [x] PUSH_AX
+- [x] PUSH_CX
+- [x] PUSH_DX
+- [x] PUSH_BX
+- [x] PUSH_SP
+- [x] PUSH_BP
+- [x] PUSH_SI
+- [x] PUSH_DI
+- [x] POP_AX
+- [x] POP_CX
+- [x] POP_DX
+- [x] POP_BX
+- [x] POP_SP
+- [x] POP_BP
+- [x] POP_SI
+- [x] POP_DI
 - [ ] JO_Jb
 - [ ] JNO_Jb
 - [ ] JB_Jb
