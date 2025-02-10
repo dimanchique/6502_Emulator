@@ -7,6 +7,7 @@
 #include "I8086/Operations/LAHF_SAHF_Ops.h"
 #include "I8086/Operations/CBW_CWD_Ops.h"
 #include "I8086/Operations/PUSH_POP_Ops.h"
+#include "I8086/Operations/MOV_Imm_Ops.h"
 
 static void I8086_INVALID_OP(BYTE, Memory&, I8086&) {}
 

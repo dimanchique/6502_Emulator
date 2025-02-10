@@ -155,22 +155,22 @@
 - [ ] LODSW
 - [ ] SCASB
 - [ ] SCASW
-- [ ] MOV_AL_Ib
-- [ ] MOV_CL_Ib
-- [ ] MOV_DL_Ib
-- [ ] MOV_BL_Ib
-- [ ] MOV_AH_Ib
-- [ ] MOV_CH_Ib
-- [ ] MOV_DH_Ib
-- [ ] MOV_BH_Ib
-- [ ] MOV_AX_Iv
-- [ ] MOV_CX_Iv
-- [ ] MOV_DX_Iv
-- [ ] MOV_BX_Iv
-- [ ] MOV_SP_Iv
-- [ ] MOV_BP_Iv
-- [ ] MOV_SI_Iv
-- [ ] MOV_DI_Iv
+- [x] MOV_AL_Ib
+- [x] MOV_CL_Ib
+- [x] MOV_DL_Ib
+- [x] MOV_BL_Ib
+- [x] MOV_AH_Ib
+- [x] MOV_CH_Ib
+- [x] MOV_DH_Ib
+- [x] MOV_BH_Ib
+- [x] MOV_AX_Iv
+- [x] MOV_CX_Iv
+- [x] MOV_DX_Iv
+- [x] MOV_BX_Iv
+- [x] MOV_SP_Iv
+- [x] MOV_BP_Iv
+- [x] MOV_SI_Iv
+- [x] MOV_DI_Iv
 - [ ] RET_Iw
 - [ ] RET
 - [ ] LES_Gv_Mp
