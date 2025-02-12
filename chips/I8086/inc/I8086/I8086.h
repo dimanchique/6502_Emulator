@@ -357,8 +357,8 @@ public:
 
     // REG | R/M should be passed
     WORD *GetSRegWordPtr(const BYTE modByte) {
-        assert(modByte <= 7);
-        WORD *regTable[] = {&ES, &CS, &SS, nullptr, nullptr, nullptr, &DS, nullptr};
+        assert(modByte <= 3);
+        WORD *regTable[] = {&ES, &CS, &SS, &DS};
         return regTable[modByte];
     }
 };

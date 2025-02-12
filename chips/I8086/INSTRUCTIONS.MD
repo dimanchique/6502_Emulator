@@ -4,31 +4,31 @@
 - [ ] ADD_Gv_Ev
 - [ ] ADD_AL_Ib
 - [ ] ADD_AX_Iv
-- [ ] PUSH_ES
-- [ ] POP_ES
+- [x] PUSH_ES
+- [x] POP_ES
 - [x] OR_Eb_Gb
 - [x] OR_Ev_Gv
 - [x] OR_Gb_Eb
 - [x] OR_Gv_Ev
 - [x] OR_AL_Ib
 - [x] OR_AX_Iv
-- [ ] PUSH_CS
+- [x] PUSH_CS
 - [ ] ADC_Eb_Gb
 - [ ] ADC_Ev_Gv
 - [ ] ADC_Gb_Eb
 - [ ] ADC_Gv_Ev
 - [ ] ADC_AL_Ib
 - [ ] ADC_AX_Iv
-- [ ] PUSH_SS
-- [ ] POP_SS
+- [x] PUSH_SS
+- [x] POP_SS
 - [ ] SBB_Eb_Gb
 - [ ] SBB_Ev_Gv
 - [ ] SBB_Gb_Eb
 - [ ] SBB_Gv_Ev
 - [ ] SBB_AL_Ib
 - [ ] SBB_AX_Iv
-- [ ] PUSH_DS
-- [ ] POP_DS
+- [x] PUSH_DS
+- [x] POP_DS
 - [x] AND_Eb_Gb
 - [x] AND_Ev_Gv
 - [x] AND_Gb_Eb
