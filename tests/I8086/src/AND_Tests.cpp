@@ -24,7 +24,11 @@ TEST_F(I8086_AND_Fixture, AND_Ev_Gv_BX_Addressed_AX) {
     const DWORD memAddress = cpu.BX + (cpu.DS << 4);
     const WORD refValue = cpu.AX & memValue;
 
-    TestMemRegInstruction(memAddress, memValue, refValue, AND_Ev_Gv, modReg, 16);
+    TestMemRegInstruction(memAddress, memValue, AND_Ev_Gv, modReg, 16);
+
+    WORD result = mem[memAddress];
+    result |= (mem[memAddress + 1] << 8);
+    EXPECT_EQ(result, refValue);
 }
 
 // Mem (Direct addressed) <-- BX & Mem (Direct addressed)
@@ -45,7 +49,11 @@ TEST_F(I8086_AND_Fixture, AND_Ev_Gv_Direct_Addressed_BX) {
     const DWORD memAddress = 0x1000;
     const WORD refValue = cpu.BX & memValue;
 
-    TestMemRegInstruction(memAddress, memValue, refValue, AND_Ev_Gv, modReg, 16);
+    TestMemRegInstruction(memAddress, memValue, AND_Ev_Gv, modReg, 16);
+
+    WORD result = mem[memAddress];
+    result |= (mem[memAddress + 1] << 8);
+    EXPECT_EQ(result, refValue);
 }
 
 // Mem (BP addressed WithDisp) <-- DX & Mem (BP addressed WithDisp)
@@ -68,7 +76,11 @@ TEST_F(I8086_AND_Fixture, AND_Ev_Gv_BP_Addressed_WithDisp_DX) {
     const DWORD memAddress = modReg.leftOp.memData.dispValue + (cpu.SS << 4);
     const WORD refValue = cpu.DX & memValue;
 
-    TestMemRegInstruction(memAddress, memValue, refValue, AND_Ev_Gv, modReg, 16);
+    TestMemRegInstruction(memAddress, memValue, AND_Ev_Gv, modReg, 16);
+
+    WORD result = mem[memAddress];
+    result |= (mem[memAddress + 1] << 8);
+    EXPECT_EQ(result, refValue);
 }
 
 // Mem (BX SI addressed WithDisp) <-- AX & Mem (BX SI addressed WithDisp)
@@ -93,7 +105,11 @@ TEST_F(I8086_AND_Fixture, AND_Ev_Gv_BXSI_Addressed_WithDisp_AX) {
     const DWORD memAddress = cpu.BX + cpu.SI + modReg.leftOp.memData.dispValue + (cpu.DS << 4);
     const WORD refValue = cpu.AX & memValue;
 
-    TestMemRegInstruction(memAddress, memValue, refValue, AND_Ev_Gv, modReg, 16);
+    TestMemRegInstruction(memAddress, memValue, AND_Ev_Gv, modReg, 16);
+
+    WORD result = mem[memAddress];
+    result |= (mem[memAddress + 1] << 8);
+    EXPECT_EQ(result, refValue);
 }
 
 // AX <-- AX & BX
@@ -104,7 +120,9 @@ TEST_F(I8086_AND_Fixture, AND_Gv_Ev_AX_BX) {
     const BYTE rightReg = wBX;
     const WORD refValue = cpu.AX & cpu.BX;
 
-    TestRegRegInstruction(&cpu.AX, &cpu.BX, refValue, &leftReg, &rightReg, AND_Gv_Ev, 16);
+    TestRegRegInstruction<WORD>(&leftReg, &rightReg, AND_Gv_Ev, 16);
+
+    EXPECT_EQ(cpu.AX, refValue);
 }
 
 // BX <-- BX & DI
@@ -115,7 +133,9 @@ TEST_F(I8086_AND_Fixture, AND_Gv_Ev_BX_DI) {
     const BYTE rightReg = wDI;
     const WORD refValue = cpu.BX & cpu.DI;
 
-    TestRegRegInstruction(&cpu.BX, &cpu.DI, refValue, &leftReg, &rightReg, AND_Gv_Ev, 16);
+    TestRegRegInstruction<WORD>(&leftReg, &rightReg, AND_Gv_Ev, 16);
+
+    EXPECT_EQ(cpu.BX, refValue);
 }
 
 // AL <-- AL & BH
@@ -126,7 +146,9 @@ TEST_F(I8086_AND_Fixture, AND_Gb_Eb_AL_BH) {
     const BYTE rightReg = bBH;
     const BYTE refValue = cpu.AL & cpu.BH;
 
-    TestRegRegInstruction(&cpu.AL, &cpu.BH, refValue, &leftReg, &rightReg, AND_Gb_Eb, 16);
+    TestRegRegInstruction<BYTE>(&leftReg, &rightReg, AND_Gb_Eb, 16);
+
+    EXPECT_EQ(cpu.AL, refValue);
 }
 
 // BL <-- BL & CL
@@ -137,7 +159,9 @@ TEST_F(I8086_AND_Fixture, AND_Gb_Eb_BL_CL) {
     const BYTE rightReg = bCL;
     const BYTE refValue = cpu.BL & cpu.CL;
 
-    TestRegRegInstruction(&cpu.BL, &cpu.CL, refValue, &leftReg, &rightReg, AND_Gb_Eb, 16);
+    TestRegRegInstruction<BYTE>(&leftReg, &rightReg, AND_Gb_Eb, 16);
+
+    EXPECT_EQ(cpu.BL, refValue);
 }
 
 TEST_F(I8086_AND_IM_Fixture, AND_AL_Ib_Test1) {
