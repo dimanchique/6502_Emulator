@@ -113,8 +113,8 @@
 - [x] GRP1_Ev_Iv
 - [ ] TEST_Gb_Eb
 - [ ] TEST_Gv_Ev
-- [ ] XCHG_Gb_Eb
-- [ ] XCHG_Gv_Ev
+- [x] XCHG_Gb_Eb
+- [x] XCHG_Gv_Ev
 - [ ] MOV_Eb_Gb
 - [ ] MOV_Ev_Gv
 - [ ] MOV_Gb_Eb

@@ -3,6 +3,28 @@
 #include "I8086/I8086.h"
 #include "Adressing.h"
 
+template<typename T>
+FORCE_INLINE void PerformXCHG(InstructionResult<T>& result) {
+    result.leftOp.after = result.rightOp.before;
+    result.rightOp.after = result.leftOp.before;
+}
+
+template<typename T>
+void I8086_EGx_EGx_XCHG(Memory &memory, I8086 &cpu) {
+    I8086_EGx_EGx<T>(memory, cpu, &PerformXCHG, nullptr, InstructionDirection::MemReg_Reg, Bidirectional);
+}
+
+//  Mem8/Reg8 <--> Mem8/Reg8
+void I8086_XCHG_Gb_Eb(BYTE OpCode, Memory &memory, I8086 &cpu) {
+    I8086_EGx_EGx_XCHG<BYTE>(memory, cpu);
+}
+
+//  Mem16/Reg16 <--> Mem16/Reg16
+void I8086_XCHG_Gv_Ev(BYTE OpCode, Memory &memory, I8086 &cpu) {
+    I8086_EGx_EGx_XCHG<WORD>(memory, cpu);
+}
+
+
 FORCE_INLINE void PerformXCHG_AX(I8086 &cpu, WORD* regPtr) {
     WORD tmp = cpu.AX;
     cpu.AX = *regPtr;
