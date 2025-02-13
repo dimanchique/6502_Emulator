@@ -38,6 +38,10 @@ enum class InstructionDirection {
     MemReg_Reg, Reg_MemReg, MemReg_Imm
 };
 
+enum OperandDirection {
+    LeftToRight = 1, RightToLeft, Bidirectional
+};
+
 enum class OperandType {
     Reg, Mem
 };

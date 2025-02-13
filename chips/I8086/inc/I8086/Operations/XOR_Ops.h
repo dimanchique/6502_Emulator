@@ -4,8 +4,9 @@
 #include "Adressing.h"
 
 template<typename T>
-T PerformXOR(const T value1, const T value2) {
-    return value1 ^ value2;
+void PerformXOR(InstructionResult<T>& result) {
+    result.leftOp.after = result.leftOp.before ^ result.rightOp.before;
+    result.rightOp.after = result.rightOp.before;
 }
 
 template<typename T>
@@ -22,7 +23,7 @@ void UpdateStatusAfterXOR_Wrapper(I8086 &cpu, const InstructionResult<T> &instru
 
 template<typename T>
 void I8086_EGx_EGx_XOR(Memory &memory, I8086 &cpu) {
-    I8086_EGx_EGx<T>(memory, cpu, &PerformXOR, &UpdateStatusAfterXOR_Wrapper, InstructionDirection::MemReg_Reg);
+    I8086_EGx_EGx<T>(memory, cpu, &PerformXOR, &UpdateStatusAfterXOR_Wrapper, InstructionDirection::MemReg_Reg, RightToLeft);
 }
 
 //  Mem8 <-- Mem8 XOR Reg8
@@ -52,8 +53,12 @@ void I8086_XOR_Gv_Ev(BYTE OpCode, Memory &memory, I8086 &cpu) {
 template<typename T>
 void I8086_XOR_Ax_Ix(T* regPtr, Memory &memory, I8086 &cpu) {
     const T value = cpu.Fetch<T>(memory);
-    *regPtr = PerformXOR(*regPtr, value);
-    UpdateStatusAfterXOR(cpu, *regPtr);
+    InstructionResult<T> instruction_result{};
+    instruction_result.leftOp.before = *regPtr;
+    instruction_result.rightOp.before = value;
+    PerformXOR(instruction_result);
+    *regPtr = instruction_result.leftOp.after;
+    UpdateStatusAfterOR(cpu, *regPtr);
 }
 
 //  AL <-- AL XOR Immediate8

@@ -4,8 +4,9 @@
 #include "Adressing.h"
 
 template<typename T>
-T PerformOR(const T value1, const T value2) {
-    return value1 | value2;
+void PerformOR(InstructionResult<T>& result) {
+    result.leftOp.after = result.leftOp.before | result.rightOp.before;
+    result.rightOp.after = result.rightOp.before;
 }
 
 template<typename T>
@@ -22,7 +23,7 @@ void UpdateStatusAfterOR_Wrapper(I8086 &cpu, const InstructionResult<T> &instruc
 
 template<typename T>
 void I8086_EGx_EGx_OR(Memory &memory, I8086 &cpu) {
-    I8086_EGx_EGx<T>(memory, cpu, &PerformOR, &UpdateStatusAfterOR_Wrapper, InstructionDirection::MemReg_Reg);
+    I8086_EGx_EGx<T>(memory, cpu, &PerformOR, &UpdateStatusAfterOR_Wrapper, InstructionDirection::MemReg_Reg, RightToLeft);
 }
 
 //  Mem8 <-- Mem8 OR Reg8
@@ -52,7 +53,11 @@ void I8086_OR_Gv_Ev(BYTE OpCode, Memory &memory, I8086 &cpu) {
 template<typename T>
 void I8086_OR_Ax_Ix(T* regPtr, Memory &memory, I8086 &cpu) {
     const T value = cpu.Fetch<T>(memory);
-    *regPtr = PerformOR(*regPtr, value);
+    InstructionResult<T> instruction_result{};
+    instruction_result.leftOp.before = *regPtr;
+    instruction_result.rightOp.before = value;
+    PerformOR(instruction_result);
+    *regPtr = instruction_result.leftOp.after;
     UpdateStatusAfterOR(cpu, *regPtr);
 }
 
