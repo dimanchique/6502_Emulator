@@ -124,13 +124,13 @@
 - [ ] MOV_Sw_Ew
 - [ ] POP_Ev
 - [ ] NOP
-- [ ] XCHG_CX_AX
-- [ ] XCHG_DX_AX
-- [ ] XCHG_BX_AX
-- [ ] XCHG_SP_AX
-- [ ] XCHG_BP_AX
-- [ ] XCHG_SI_AX
-- [ ] XCHG_DI_AX
+- [x] XCHG_CX_AX
+- [x] XCHG_DX_AX
+- [x] XCHG_BX_AX
+- [x] XCHG_SP_AX
+- [x] XCHG_BP_AX
+- [x] XCHG_SI_AX
+- [x] XCHG_DI_AX
 - [x] CBW
 - [x] CWD
 - [ ] CALL_Ap

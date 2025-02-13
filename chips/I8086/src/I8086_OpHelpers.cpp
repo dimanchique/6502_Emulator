@@ -3,6 +3,7 @@
 #include "I8086/Operations/GRP_Ops.h"
 #include "I8086/Operations/OR_Ops.h"
 #include "I8086/Operations/AND_Ops.h"
+#include "I8086/Operations/XCHG_Ops.h"
 #include "I8086/Operations/ST_CL_Ops.h"
 #include "I8086/Operations/LAHF_SAHF_Ops.h"
 #include "I8086/Operations/CBW_CWD_Ops.h"
