@@ -123,7 +123,7 @@
 - [ ] LEA_Gv_M
 - [ ] MOV_Sw_Ew
 - [ ] POP_Ev
-- [ ] NOP
+- [x] NOP
 - [x] XCHG_CX_AX
 - [x] XCHG_DX_AX
 - [x] XCHG_BX_AX
